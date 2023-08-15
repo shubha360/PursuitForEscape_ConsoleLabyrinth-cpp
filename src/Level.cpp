@@ -45,6 +45,12 @@ bool Level::loadLevel() {
 	getline(loadFile, line);
 	getline(loadFile, line);
 
+	loadFile >> _playerX;
+	getline(loadFile, line);
+	loadFile >> _playerY;
+	getline(loadFile, line);
+	getline(loadFile, line);
+
 	loadFile >> _escapeX;
 	getline(loadFile, line);
 	loadFile >> _escapeY;

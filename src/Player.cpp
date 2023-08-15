@@ -6,13 +6,14 @@ const int Player::PLAYER_HEALTH = 100;
 const int Player::PLAYER_STARTING_MONEY = 100;
 
 Player::Player(Level* level, Camera* camera) {
-	_posX = 2;
-	_posY = 2;
+	_posX = level->getPlayerX();
+	_posY = level->getPlayerY();
 
 	_currentLevel = level;
 	_currentLevel->setPlayer(_posX, _posY);
 
 	_camera = camera;
+	_camera->setCameraPosition(_posX, _posY);
 
 	_currentHealth = 100;
 	_money = 100;

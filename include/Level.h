@@ -29,6 +29,8 @@ public:
 	int getNumberOfArtifacts(){ return _numberOfArtifacts; }
 	int getEscapeX() { return _escapeX; }
 	int getEscapeY() { return _escapeY; }
+	int getPlayerX() { return _playerX; }
+	int getPlayerY() { return _playerY; }
 
 private:
 	string _levelName;
@@ -36,6 +38,7 @@ private:
 	vector<string> _levelGrid;
 
 	int _rows, _columns;
+	int _playerX, _playerY;
 	int _numberOfArtifacts;
 	bool _levelLoaded;
 	int _escapeX, _escapeY;

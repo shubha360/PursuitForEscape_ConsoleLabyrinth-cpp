@@ -18,9 +18,9 @@ int main() {
 		player.printPlayerInfo();
 
 		do {
-
 			char input = _getch();
-			
+			cout << input << endl;
+
 			if (!player.movePlayer(input)) {
 				break;
 			}
