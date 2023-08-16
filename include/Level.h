@@ -16,8 +16,7 @@ public:
 	static const char SIGN_ARTIFACT;
 
 	Level();
-	Level(string levelName, string fileLocation);
-	bool loadLevel();
+	bool loadLevel(string levelFileLocation);
 	void printLevel();
 	char getPositionAtGrid(int x, int y);
 	void setPlayer(int newX, int newY);

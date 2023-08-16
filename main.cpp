@@ -8,9 +8,9 @@ using namespace std;
 
 int main() {
 
-	Level level("1", "files/level_1.txt");
+	Level level;
 	
-	if (level.loadLevel()) {
+	if (level.loadLevel("files/level_1.txt")) {
 		Camera camera(&level);
 		Player player(&level, &camera);
 
@@ -19,7 +19,6 @@ int main() {
 
 		do {
 			char input = _getch();
-			cout << input << endl;
 
 			if (!player.movePlayer(input)) {
 				break;

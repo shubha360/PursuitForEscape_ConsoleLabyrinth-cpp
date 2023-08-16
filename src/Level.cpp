@@ -20,15 +20,9 @@ Level::Level() {
 	_levelLoaded = false;
 }
 
-Level::Level(string levelName, string fileLocation) {
-	_levelName = levelName;
-	_levelFileLocation = fileLocation;
-	_rows = -1;
-	_columns = -1;
-	_levelLoaded = false;
-}
+bool Level::loadLevel(string levelFileLocation) {
+	_levelFileLocation = levelFileLocation;
 
-bool Level::loadLevel() {
 	ifstream loadFile;
 	loadFile.open(_levelFileLocation);
 
@@ -39,6 +33,9 @@ bool Level::loadLevel() {
 
 	string line;
 	
+	getline(loadFile, _levelName);
+	getline(loadFile, line);
+
 	loadFile >> _rows;
 	getline(loadFile, line);
 	loadFile >> _columns;
@@ -82,18 +79,37 @@ void Level::printLevel() {
 }
 
 char Level::getPositionAtGrid(int x, int y) {
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+		return SIGN_WALL;
+	}
 	return _levelGrid[y][x];
 }
 
 void Level::setPlayer(int newX, int newY) {
-	_levelGrid[newY][newX] = SIGN_PLAYER;
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+	}
+	else {
+		_levelGrid[newY][newX] = SIGN_PLAYER;
+	}
 }
 
 void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
-	_levelGrid[oldY][oldX] = SIGN_EMPTY;
-	_levelGrid[newY][newX] = SIGN_PLAYER;
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+	}
+	else {
+		_levelGrid[oldY][oldX] = SIGN_EMPTY;
+		_levelGrid[newY][newX] = SIGN_PLAYER;
+	}
 }
 
 void Level::openEscapeGate() {
-	_levelGrid[_escapeY][_escapeX] = SIGN_GATE_OPEN;
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+	}
+	else {
+		_levelGrid[_escapeY][_escapeX] = SIGN_GATE_OPEN;
+	}
 }

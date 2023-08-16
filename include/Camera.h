@@ -15,9 +15,9 @@ private:
 	int _posX, _posY;
 	Level* _currentLevel;
 
-	string _topAndBottomLine;
-	string _screenIndentTop;
-	string _screenIndentBottom;
-	string _screenIndentLeft;
+	static const string _topAndBottomLine;
+	static const string _screenIndentTop;
+	static const string _screenIndentBottom;
+	static const string _screenIndentLeft;
 };
 
