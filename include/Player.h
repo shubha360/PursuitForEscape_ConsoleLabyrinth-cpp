@@ -13,6 +13,7 @@ public:
 	Player(Level* level, Camera* camera);
 	bool movePlayer(char input);
 	void printPlayerInfo();
+	void updatePlayerAfterGameStateChange();
 
 	int getPositionX() { return _posX; };
 	int getPositionY() { return _posY; };

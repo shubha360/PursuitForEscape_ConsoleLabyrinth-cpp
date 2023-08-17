@@ -15,11 +15,11 @@ int main() {
 	string intro = emptyLines + '\n' + spaces + signs + '\n' + spaces + name + '\n' + spaces + signs + emptyLines;
 	cout << intro;
 
-	string menu = "1. New Game\n2. Load Game\n3. Quit\n\nYour input: ";
+	string menu = "1. New Game\n2. Load Game\n3. Exit Game\n\nYour input: ";
 	char input = ' ';
 	bool introLoop = true;
 	
-	Level level;
+	Level level("files/level_1.txt");
 	string levelFileLocation;
 	bool levelLoaded = false;
 
@@ -30,8 +30,7 @@ int main() {
 
 		switch (input) {
 		case '1': // new game
-			levelFileLocation = "files/level_1.txt";
-			levelLoaded = level.loadLevel(levelFileLocation);
+			levelLoaded = level.loadLevel(level.getLevelFileLocation());
 
 			if (levelLoaded) {
 				introLoop = false;
@@ -42,8 +41,7 @@ int main() {
 			break;
 
 		case '2': // load game
-			levelFileLocation = "files/save_file.txt";
-			levelLoaded = level.loadLevel(levelFileLocation);
+			levelLoaded = level.loadLevel(Level::SAVE_FILE_LOCATION);
 
 			if (levelLoaded) {
 				introLoop = false;
@@ -81,6 +79,8 @@ int main() {
 
 		} while (true);
 	}
+
+	cout << "Game exited!\n\n";
 
 	return 0;
 }

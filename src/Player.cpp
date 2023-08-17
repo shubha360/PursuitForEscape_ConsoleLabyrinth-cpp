@@ -64,8 +64,30 @@ bool Player::movePlayer(char input) {
 		}
 		break;
 
-	case 'j':
+	case 'j': // save game
 		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
+		break;
+
+	case 'm': // load game
+		if (!_currentLevel->loadLevel(Level::SAVE_FILE_LOCATION)) {
+			cout << "No load game exists!\n\n";
+		}
+		else {
+			updatePlayerAfterGameStateChange();
+		}
+		break;
+
+	case 'n': // new game
+		_currentLevel->loadLevel(_currentLevel->getLevelFileLocation());
+		updatePlayerAfterGameStateChange();
+		break;
+
+	case 'l': // delete save game
+		_currentLevel->deleteSaveGame();
+		break;
+
+	case 27: // exit game
+		continueGame = false;
 		break;
 	}
 
@@ -94,28 +116,27 @@ bool Player::movePlayer(char input) {
 
 void Player::printPlayerInfo() {
 
-	stringstream artifacts;
-	artifacts << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << ' ';
-
 	stringstream first; 
-	first << "Health: " << _currentHealth; 
-	first << string(artifacts.str().size() - first.str().size(), ' ') << "| WASD - Player movement\n";
+	first << "Health: " << _currentHealth << "                | WASD - Player movement | N - New game\n";
 
 	stringstream second;
-	second << "Money: " << _money;
-	second << string(artifacts.str().size() - second.str().size(), ' ') << "| J - Save game\n";
+	second << "Money: " << _money << "                 | J - Save game          | L - Delete Save Game\n";
 
 	stringstream third;
-	third << artifacts.str() << "| M - Load game\n";
+	third << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << " | M - Load game          | Esc - Exit game\n\n";
 
 	cout << first.str();
 	cout << second.str();
 	cout << third.str();
+}
 
-	/*cout << "Health: " << _currentHealth << endl;
-	cout << "Money: " << _money << endl;
-	cout << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << endl << endl;
-	cout << "WASD - Player movement\n";
-	cout << "J - Save game\n";
-	cout << "M - Load game\n";*/
+void Player::updatePlayerAfterGameStateChange() {
+	_posX = _currentLevel->getPlayerX();
+	_posY = _currentLevel->getPlayerY();
+
+	_camera->setCameraPosition(_posX, _posY);
+
+	_currentHealth = _currentLevel->getPlayerHealth();
+	_money = _currentLevel->getPlayerMoney();
+	_artifactsCollected = _currentLevel->getArtifactsCollected();
 }

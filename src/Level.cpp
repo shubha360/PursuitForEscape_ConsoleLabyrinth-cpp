@@ -11,23 +11,25 @@ const char Level::SIGN_GATE_OPEN = '~';
 const char Level::SIGN_PLAYER = '@';
 const char Level::SIGN_ARTIFACT = '!';
 
-Level::Level() {
+const string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
+const string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
+
+Level::Level(string levelFileLocation) {
 	_levelName = "NONE";
-	_levelFileLocation = "NONE";
+	_levelFileLocation = levelFileLocation;
 	_rows = -1;
 	_columns = -1;
 	_numberOfArtifacts = -1;
 	_levelLoaded = false;
 }
 
-bool Level::loadLevel(string levelFileLocation) {
-	_levelFileLocation = levelFileLocation;
+bool Level::loadLevel(string currentFileLocation) {
 
 	ifstream loadFile;
-	loadFile.open(_levelFileLocation);
+	loadFile.open(currentFileLocation);
 
 	if (loadFile.fail()) {
-		perror(_levelFileLocation.c_str());
+		perror(currentFileLocation.c_str());
 		return false;
 	}
 
@@ -35,7 +37,8 @@ bool Level::loadLevel(string levelFileLocation) {
 	
 	getline(loadFile, line);
 
-	if (line == "NO SAVE DATA") {
+	if (line == SAVE_FILE_DEFAULT_TEXT) {
+		loadFile.close();
 		return false;
 	}
 
@@ -80,17 +83,17 @@ bool Level::loadLevel(string levelFileLocation) {
 	}
 
 	_levelLoaded = true;
+	loadFile.close();
 	return true;
 }
 
 void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
 	ofstream saveFile;
-	string saveFileLocation = "files/save_file.txt";
 
-	saveFile.open(saveFileLocation);
+	saveFile.open(SAVE_FILE_LOCATION);
 
 	if (saveFile.fail()) {
-		perror(saveFileLocation.c_str());
+		perror(SAVE_FILE_LOCATION.c_str());
 	}
 
 	saveFile << _levelName << "\n\n";
@@ -117,6 +120,19 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 			saveFile << endl;
 		}
 	}
+	saveFile.close();
+}
+
+void Level::deleteSaveGame() {
+	ofstream saveFile;
+	saveFile.open(SAVE_FILE_LOCATION);
+
+	if (saveFile.fail()) {
+		perror(SAVE_FILE_LOCATION.c_str());
+	}
+
+	saveFile << SAVE_FILE_DEFAULT_TEXT;
+	saveFile.close();
 }
 
 void Level::printLevel() {
