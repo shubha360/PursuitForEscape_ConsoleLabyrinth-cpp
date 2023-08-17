@@ -33,7 +33,13 @@ bool Level::loadLevel(string levelFileLocation) {
 
 	string line;
 	
-	getline(loadFile, _levelName);
+	getline(loadFile, line);
+
+	if (line == "NO SAVE DATA") {
+		return false;
+	}
+
+	_levelName = line;
 	getline(loadFile, line);
 
 	loadFile >> _rows;
@@ -54,6 +60,16 @@ bool Level::loadLevel(string levelFileLocation) {
 	getline(loadFile, line);
 	getline(loadFile, line);
 
+	loadFile >> _playerHealth;
+	getline(loadFile, line);
+
+	loadFile >> _playerMoney;
+	getline(loadFile, line);
+
+	loadFile >> _artifactsCollected;
+	getline(loadFile, line);
+	getline(loadFile, line);
+
 	loadFile >> _numberOfArtifacts;
 	getline(loadFile, line);
 	getline(loadFile, line);
@@ -65,6 +81,42 @@ bool Level::loadLevel(string levelFileLocation) {
 
 	_levelLoaded = true;
 	return true;
+}
+
+void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
+	ofstream saveFile;
+	string saveFileLocation = "files/save_file.txt";
+
+	saveFile.open(saveFileLocation);
+
+	if (saveFile.fail()) {
+		perror(saveFileLocation.c_str());
+	}
+
+	saveFile << _levelName << "\n\n";
+	
+	saveFile << _rows << endl;
+	saveFile << _columns << "\n\n";
+
+	saveFile << playerPosX << endl;
+	saveFile << playerPosY << "\n\n";
+
+	saveFile << _escapeX << endl;
+	saveFile << _escapeY << "\n\n";
+
+	saveFile << playerHealth << endl;
+	saveFile << playerMoney << endl;
+	saveFile << playerArtifacts << "\n\n";
+
+	saveFile << _numberOfArtifacts << "\n\n";
+
+	for (int i = 0; i < _rows; i++) {
+		saveFile << _levelGrid[i];
+
+		if (i < _rows - 1) {
+			saveFile << endl;
+		}
+	}
 }
 
 void Level::printLevel() {

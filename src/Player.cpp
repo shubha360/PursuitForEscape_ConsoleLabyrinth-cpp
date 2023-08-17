@@ -15,9 +15,9 @@ Player::Player(Level* level, Camera* camera) {
 	_camera = camera;
 	_camera->setCameraPosition(_posX, _posY);
 
-	_currentHealth = 100;
-	_money = 100;
-	_artifactsCollected = 0;
+	_currentHealth = _currentLevel->getPlayerHealth();
+	_money = _currentLevel->getPlayerMoney();
+	_artifactsCollected = _currentLevel->getArtifactsCollected();
 }
 
 bool Player::movePlayer(char input) {
@@ -63,6 +63,10 @@ bool Player::movePlayer(char input) {
 			_posX++;
 		}
 		break;
+
+	case 'j':
+		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
+		break;
 	}
 
 	if (_posX != oldX || _posY != oldY) {
@@ -89,7 +93,29 @@ bool Player::movePlayer(char input) {
 }
 
 void Player::printPlayerInfo() {
-	cout << "Health: " << _currentHealth << endl;
+
+	stringstream artifacts;
+	artifacts << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << ' ';
+
+	stringstream first; 
+	first << "Health: " << _currentHealth; 
+	first << string(artifacts.str().size() - first.str().size(), ' ') << "| WASD - Player movement\n";
+
+	stringstream second;
+	second << "Money: " << _money;
+	second << string(artifacts.str().size() - second.str().size(), ' ') << "| J - Save game\n";
+
+	stringstream third;
+	third << artifacts.str() << "| M - Load game\n";
+
+	cout << first.str();
+	cout << second.str();
+	cout << third.str();
+
+	/*cout << "Health: " << _currentHealth << endl;
 	cout << "Money: " << _money << endl;
-	cout << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << endl;
+	cout << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << endl << endl;
+	cout << "WASD - Player movement\n";
+	cout << "J - Save game\n";
+	cout << "M - Load game\n";*/
 }

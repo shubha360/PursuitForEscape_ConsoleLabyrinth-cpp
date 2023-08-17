@@ -17,6 +17,7 @@ public:
 
 	Level();
 	bool loadLevel(string levelFileLocation);
+	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts);
 	void printLevel();
 	char getPositionAtGrid(int x, int y);
 	void setPlayer(int newX, int newY);
@@ -31,6 +32,10 @@ public:
 	int getPlayerX() { return _playerX; }
 	int getPlayerY() { return _playerY; }
 
+	int getPlayerHealth() { return _playerHealth; }
+	int getPlayerMoney() { return _playerMoney; }
+	int getArtifactsCollected() { return _artifactsCollected; }
+
 private:
 	string _levelName;
 	string _levelFileLocation;
@@ -38,6 +43,7 @@ private:
 
 	int _rows, _columns;
 	int _playerX, _playerY;
+	int _playerHealth, _playerMoney, _artifactsCollected;
 	int _numberOfArtifacts;
 	bool _levelLoaded;
 	int _escapeX, _escapeY;

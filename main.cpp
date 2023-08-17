@@ -17,6 +17,11 @@ int main() {
 
 	string menu = "1. New Game\n2. Load Game\n3. Quit\n\nYour input: ";
 	char input = ' ';
+	bool introLoop = true;
+	
+	Level level;
+	string levelFileLocation;
+	bool levelLoaded = false;
 
 	do {
 		cout << menu;
@@ -24,13 +29,32 @@ int main() {
 		cout << input << "\n\n";
 
 		switch (input) {
-		case '1':
+		case '1': // new game
+			levelFileLocation = "files/level_1.txt";
+			levelLoaded = level.loadLevel(levelFileLocation);
+
+			if (levelLoaded) {
+				introLoop = false;
+			}
+			else {
+				cout << "Something went wrong!\n\n";
+			}
 			break;
 
-		case '2':
+		case '2': // load game
+			levelFileLocation = "files/save_file.txt";
+			levelLoaded = level.loadLevel(levelFileLocation);
+
+			if (levelLoaded) {
+				introLoop = false;
+			}
+			else {
+				cout << "No load game exists!\n\n";
+			}
 			break;
 
-		case '3':
+		case '3': // quit
+			introLoop = false;
 			break;
 
 		default:
@@ -38,12 +62,10 @@ int main() {
 			break;
 		}
 
-	} while (input != '3');
+	} while (introLoop);
 
-
-	/*Level level;
 	
-	if (level.loadLevel("files/level_1.txt")) {
+	if (levelLoaded) {
 		Camera camera(&level);
 		Player player(&level, &camera);
 
@@ -58,9 +80,7 @@ int main() {
 			}
 
 		} while (true);
-	}*/
-
-	cout << "Game ended\n\n";
+	}
 
 	return 0;
 }
