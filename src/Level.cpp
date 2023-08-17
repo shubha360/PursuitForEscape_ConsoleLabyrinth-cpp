@@ -79,7 +79,13 @@ bool Level::loadLevel(string currentFileLocation) {
 
 	for (int i = 0; i < _rows; i++) {
 		getline(loadFile, line);
-		_levelGrid.push_back(line);
+
+		if (_levelGrid.size() < _rows) {
+			_levelGrid.push_back(line);
+		}
+		else {
+			_levelGrid[i] = line;
+		}
 	}
 
 	_levelLoaded = true;

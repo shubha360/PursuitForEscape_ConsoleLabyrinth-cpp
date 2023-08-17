@@ -10,7 +10,6 @@ Player::Player(Level* level, Camera* camera) {
 	_posY = level->getPlayerY();
 
 	_currentLevel = level;
-	_currentLevel->setPlayer(_posX, _posY);
 
 	_camera = camera;
 	_camera->setCameraPosition(_posX, _posY);
