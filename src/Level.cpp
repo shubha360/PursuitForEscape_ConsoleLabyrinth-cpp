@@ -11,37 +11,49 @@ const char Level::SIGN_GATE_OPEN = '~';
 const char Level::SIGN_PLAYER = '@';
 const char Level::SIGN_ARTIFACT = '!';
 
-Level::Level() {
+const string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
+const string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
+
+Level::Level(string levelFileLocation) {
 	_levelName = "NONE";
-	_levelFileLocation = "NONE";
+	_levelFileLocation = levelFileLocation;
 	_rows = -1;
 	_columns = -1;
 	_numberOfArtifacts = -1;
 	_levelLoaded = false;
 }
 
-Level::Level(string levelName, string fileLocation) {
-	_levelName = levelName;
-	_levelFileLocation = fileLocation;
-	_rows = -1;
-	_columns = -1;
-	_levelLoaded = false;
-}
+bool Level::loadLevel(string currentFileLocation) {
 
-bool Level::loadLevel() {
 	ifstream loadFile;
-	loadFile.open(_levelFileLocation);
+	loadFile.open(currentFileLocation);
 
 	if (loadFile.fail()) {
-		perror(_levelFileLocation.c_str());
+		perror(currentFileLocation.c_str());
 		return false;
 	}
 
 	string line;
 	
+	getline(loadFile, line);
+
+	if (line == SAVE_FILE_DEFAULT_TEXT) {
+		loadFile.close();
+		return false;
+	}
+
+	_levelName = line;
+	getline(loadFile, line);
+
 	loadFile >> _rows;
 	getline(loadFile, line);
 	loadFile >> _columns;
+	getline(loadFile, line);
+	getline(loadFile, line);
+
+	loadFile >> _playerX;
+	getline(loadFile, line);
+	loadFile >> _playerY;
 	getline(loadFile, line);
 	getline(loadFile, line);
 
@@ -51,17 +63,82 @@ bool Level::loadLevel() {
 	getline(loadFile, line);
 	getline(loadFile, line);
 
+	loadFile >> _playerHealth;
+	getline(loadFile, line);
+
+	loadFile >> _playerMoney;
+	getline(loadFile, line);
+
+	loadFile >> _artifactsCollected;
+	getline(loadFile, line);
+	getline(loadFile, line);
+
 	loadFile >> _numberOfArtifacts;
 	getline(loadFile, line);
 	getline(loadFile, line);
 
 	for (int i = 0; i < _rows; i++) {
 		getline(loadFile, line);
-		_levelGrid.push_back(line);
+
+		if (_levelGrid.size() < _rows) {
+			_levelGrid.push_back(line);
+		}
+		else {
+			_levelGrid[i] = line;
+		}
 	}
 
 	_levelLoaded = true;
+	loadFile.close();
 	return true;
+}
+
+void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
+	ofstream saveFile;
+
+	saveFile.open(SAVE_FILE_LOCATION);
+
+	if (saveFile.fail()) {
+		perror(SAVE_FILE_LOCATION.c_str());
+	}
+
+	saveFile << _levelName << "\n\n";
+	
+	saveFile << _rows << endl;
+	saveFile << _columns << "\n\n";
+
+	saveFile << playerPosX << endl;
+	saveFile << playerPosY << "\n\n";
+
+	saveFile << _escapeX << endl;
+	saveFile << _escapeY << "\n\n";
+
+	saveFile << playerHealth << endl;
+	saveFile << playerMoney << endl;
+	saveFile << playerArtifacts << "\n\n";
+
+	saveFile << _numberOfArtifacts << "\n\n";
+
+	for (int i = 0; i < _rows; i++) {
+		saveFile << _levelGrid[i];
+
+		if (i < _rows - 1) {
+			saveFile << endl;
+		}
+	}
+	saveFile.close();
+}
+
+void Level::deleteSaveGame() {
+	ofstream saveFile;
+	saveFile.open(SAVE_FILE_LOCATION);
+
+	if (saveFile.fail()) {
+		perror(SAVE_FILE_LOCATION.c_str());
+	}
+
+	saveFile << SAVE_FILE_DEFAULT_TEXT;
+	saveFile.close();
 }
 
 void Level::printLevel() {
@@ -76,18 +153,37 @@ void Level::printLevel() {
 }
 
 char Level::getPositionAtGrid(int x, int y) {
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+		return SIGN_WALL;
+	}
 	return _levelGrid[y][x];
 }
 
 void Level::setPlayer(int newX, int newY) {
-	_levelGrid[newY][newX] = SIGN_PLAYER;
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+	}
+	else {
+		_levelGrid[newY][newX] = SIGN_PLAYER;
+	}
 }
 
 void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
-	_levelGrid[oldY][oldX] = SIGN_EMPTY;
-	_levelGrid[newY][newX] = SIGN_PLAYER;
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+	}
+	else {
+		_levelGrid[oldY][oldX] = SIGN_EMPTY;
+		_levelGrid[newY][newX] = SIGN_PLAYER;
+	}
 }
 
 void Level::openEscapeGate() {
-	_levelGrid[_escapeY][_escapeX] = SIGN_GATE_OPEN;
+	if (!_levelLoaded) {
+		cout << "Level not loaded!\n";
+	}
+	else {
+		_levelGrid[_escapeY][_escapeX] = SIGN_GATE_OPEN;
+	}
 }

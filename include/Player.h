@@ -3,6 +3,8 @@
 #include "Level.h"
 #include "Camera.h"
 
+#include <sstream>
+
 class Player {
 public:
 	static const int PLAYER_HEALTH;
@@ -11,6 +13,13 @@ public:
 	Player(Level* level, Camera* camera);
 	bool movePlayer(char input);
 	void printPlayerInfo();
+	void updatePlayerAfterGameStateChange();
+
+	int getPositionX() { return _posX; };
+	int getPositionY() { return _posY; };
+	int getHealth() { return _currentHealth; };
+	int getMoney() { return _money; };
+	int getArtifactsCollected() { return _artifactsCollected; };
 
 private:
 	int _posX, _posY;

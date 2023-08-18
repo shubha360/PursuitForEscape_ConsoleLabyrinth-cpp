@@ -5,15 +5,15 @@
 const int Camera::CAMERA_WIDTH = 40;
 const int Camera::CAMERA_HEIGHT = 20;
 
+const string Camera::_topAndBottomLine = string(CAMERA_WIDTH, '-');
+const string Camera::_screenIndentTop = string(3, '\n');
+const string Camera::_screenIndentBottom = string(5, '\n');
+const string Camera::_screenIndentLeft = string(5, ' ');
+
 Camera::Camera(Level* level) {
 	_posX = 0;
 	_posY = 0;
 	_currentLevel = level;
-
-	_topAndBottomLine = string(CAMERA_WIDTH, '-');
-	_screenIndentTop = string(5, '\n');
-	_screenIndentBottom = string(5, '\n');
-	_screenIndentLeft = string(5, ' ');
 }
 
 void Camera::setCameraPosition(int x, int y) {

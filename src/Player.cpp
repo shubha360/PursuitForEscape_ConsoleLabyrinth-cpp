@@ -6,17 +6,19 @@ const int Player::PLAYER_HEALTH = 100;
 const int Player::PLAYER_STARTING_MONEY = 100;
 
 Player::Player(Level* level, Camera* camera) {
-	_posX = 2;
-	_posY = 2;
-
 	_currentLevel = level;
-	_currentLevel->setPlayer(_posX, _posY);
-
 	_camera = camera;
 
-	_currentHealth = 100;
-	_money = 100;
-	_artifactsCollected = 0;
+	_posX = _currentLevel->getPlayerX();
+	_posY = _currentLevel->getPlayerY();
+
+	_currentHealth = _currentLevel->getPlayerHealth();
+	_money = _currentLevel->getPlayerMoney();
+	_artifactsCollected = _currentLevel->getArtifactsCollected();
+
+	_currentLevel->setPlayer(_posX, _posY);
+
+	_camera->setCameraPosition(_posX, _posY);
 }
 
 bool Player::movePlayer(char input) {
@@ -62,6 +64,36 @@ bool Player::movePlayer(char input) {
 			_posX++;
 		}
 		break;
+
+	case 'j': // save game
+		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
+		break;
+
+	case 'm': // load game
+		if (!_currentLevel->loadLevel(Level::SAVE_FILE_LOCATION)) {
+			cout << "No load game exists!\n\n";
+		}
+		else {
+			updatePlayerAfterGameStateChange();
+			oldX = _posX;
+			oldY = _posY;
+		}
+		break;
+
+	case 'n': // new game
+		_currentLevel->loadLevel(_currentLevel->getLevelFileLocation());
+		updatePlayerAfterGameStateChange();
+		oldX = _posX;
+		oldY = _posY;
+		break;
+
+	case 'l': // delete save game
+		_currentLevel->deleteSaveGame();
+		break;
+
+	case 27: // exit game
+		continueGame = false;
+		break;
 	}
 
 	if (_posX != oldX || _posY != oldY) {
@@ -88,7 +120,32 @@ bool Player::movePlayer(char input) {
 }
 
 void Player::printPlayerInfo() {
-	cout << "Health: " << _currentHealth << endl;
-	cout << "Money: " << _money << endl;
-	cout << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << endl;
+
+	stringstream first; 
+	first << "Health: " << _currentHealth << "                | WASD - Player movement | N - New game\n";
+
+	stringstream second;
+	second << "Money: " << _money << "                 | J - Save game          | L - Delete Save Game\n";
+
+	stringstream third;
+	third << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << " | M - Load game          | Esc - Exit game\n\n";
+
+	cout << first.str();
+	cout << second.str();
+	cout << third.str();
+}
+
+void Player::updatePlayerAfterGameStateChange() {
+	_posX = _currentLevel->getPlayerX();
+	_posY = _currentLevel->getPlayerY();
+
+	_currentHealth = _currentLevel->getPlayerHealth();
+	_money = _currentLevel->getPlayerMoney();
+	_artifactsCollected = _currentLevel->getArtifactsCollected();
+
+	_currentLevel->setPlayer(_posX, _posY);
+	_camera->setCameraPosition(_posX, _posY);
+
+	_camera->render();
+	printPlayerInfo();
 }
