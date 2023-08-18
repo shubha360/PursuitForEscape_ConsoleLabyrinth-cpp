@@ -6,17 +6,19 @@ const int Player::PLAYER_HEALTH = 100;
 const int Player::PLAYER_STARTING_MONEY = 100;
 
 Player::Player(Level* level, Camera* camera) {
-	_posX = level->getPlayerX();
-	_posY = level->getPlayerY();
-
 	_currentLevel = level;
-
 	_camera = camera;
-	_camera->setCameraPosition(_posX, _posY);
+
+	_posX = _currentLevel->getPlayerX();
+	_posY = _currentLevel->getPlayerY();
 
 	_currentHealth = _currentLevel->getPlayerHealth();
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
+
+	_currentLevel->setPlayer(_posX, _posY);
+
+	_camera->setCameraPosition(_posX, _posY);
 }
 
 bool Player::movePlayer(char input) {
@@ -73,12 +75,16 @@ bool Player::movePlayer(char input) {
 		}
 		else {
 			updatePlayerAfterGameStateChange();
+			oldX = _posX;
+			oldY = _posY;
 		}
 		break;
 
 	case 'n': // new game
 		_currentLevel->loadLevel(_currentLevel->getLevelFileLocation());
 		updatePlayerAfterGameStateChange();
+		oldX = _posX;
+		oldY = _posY;
 		break;
 
 	case 'l': // delete save game
@@ -133,9 +139,13 @@ void Player::updatePlayerAfterGameStateChange() {
 	_posX = _currentLevel->getPlayerX();
 	_posY = _currentLevel->getPlayerY();
 
-	_camera->setCameraPosition(_posX, _posY);
-
 	_currentHealth = _currentLevel->getPlayerHealth();
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
+
+	_currentLevel->setPlayer(_posX, _posY);
+	_camera->setCameraPosition(_posX, _posY);
+
+	_camera->render();
+	printPlayerInfo();
 }
