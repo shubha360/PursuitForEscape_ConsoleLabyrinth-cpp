@@ -10,6 +10,24 @@ const string Camera::_screenIndentTop = string(3, '\n');
 const string Camera::_screenIndentBottom = string(5, '\n');
 const string Camera::_screenIndentLeft = string(5, ' ');
 
+const vector<string> Camera::_legend = { 
+	"#  Wall", 
+	"=  Escape Gate Wall", 
+	"X  Escape Gate Locked", 
+	"~  Escape Gate Open", 
+	"!  Artifacts", 
+	"1  Shop", 
+	"2  Refill Health", 
+	"3  Map View", 
+	"S  Snake", 
+	"Z  Zombie", 
+	"W  Witch", 
+	"M  Monster", 
+	"$  Random Money", 
+	"+  10 Health", 
+	"^  Shield For 5 Moves" 
+};
+
 Camera::Camera(Level* level) {
 	_posX = 0;
 	_posY = 0;
@@ -39,6 +57,8 @@ void Camera::setCameraPosition(int x, int y) {
 void Camera::render() {
 	cout << _screenIndentTop;
 
+	int legendIterator = 0;
+
 	for (int y = _posY - 1; y <= _posY + CAMERA_HEIGHT; y++) {
 
 		if (y == _posY - 1 || y == _posY + CAMERA_HEIGHT) {
@@ -52,7 +72,12 @@ void Camera::render() {
 					if (x == _posX - 1) {
 						cout << _screenIndentLeft;
 					}
+					
 					cout << '|';
+
+					if (x == _posX + CAMERA_WIDTH && y >= 0 && legendIterator < _legend.size()) {
+						cout << "  " << _legend[legendIterator++];
+					}
 				}
 				else {
 					cout << _currentLevel->getPositionAtGrid(x, y);

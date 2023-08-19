@@ -19,5 +19,7 @@ private:
 	static const string _screenIndentTop;
 	static const string _screenIndentBottom;
 	static const string _screenIndentLeft;
+
+	static const vector<string> _legend;
 };
 
