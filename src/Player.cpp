@@ -66,6 +66,7 @@ bool Player::movePlayer(char input) {
 		break;
 
 	case 'j': // save game
+
 		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
 		break;
 
@@ -121,18 +122,14 @@ bool Player::movePlayer(char input) {
 
 void Player::printPlayerInfo() {
 
-	stringstream first; 
-	first << "Health: " << _currentHealth << "                | WASD - Player movement | N - New game\n";
+	string infoStr = "Health: " + to_string(_currentHealth)
+		+ "                | WASD - Player movement | N - New game\n"
+		+ "Money: " + to_string(_money)
+		+ "                 | J - Save game          | L - Delete Save Game\n"
+		+ "Artifacts Collected: " + to_string(_artifactsCollected) + " / " + to_string(_currentLevel->getNumberOfArtifacts())
+		+ " | M - Load game          | Esc - Exit game\n\n";
 
-	stringstream second;
-	second << "Money: " << _money << "                 | J - Save game          | L - Delete Save Game\n";
-
-	stringstream third;
-	third << "Artifacts Collected: " << _artifactsCollected << " / " << _currentLevel->getNumberOfArtifacts() << " | M - Load game          | Esc - Exit game\n\n";
-
-	cout << first.str();
-	cout << second.str();
-	cout << third.str();
+	cout << infoStr;
 }
 
 void Player::updatePlayerAfterGameStateChange() {

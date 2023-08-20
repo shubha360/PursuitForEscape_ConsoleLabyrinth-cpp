@@ -94,6 +94,7 @@ bool Level::loadLevel(string currentFileLocation) {
 }
 
 void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
+
 	ofstream saveFile;
 
 	saveFile.open(SAVE_FILE_LOCATION);
@@ -102,30 +103,22 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 		perror(SAVE_FILE_LOCATION.c_str());
 	}
 
-	saveFile << _levelName << "\n\n";
-	
-	saveFile << _rows << endl;
-	saveFile << _columns << "\n\n";
-
-	saveFile << playerPosX << endl;
-	saveFile << playerPosY << "\n\n";
-
-	saveFile << _escapeX << endl;
-	saveFile << _escapeY << "\n\n";
-
-	saveFile << playerHealth << endl;
-	saveFile << playerMoney << endl;
-	saveFile << playerArtifacts << "\n\n";
-
-	saveFile << _numberOfArtifacts << "\n\n";
+	string output = _levelName + "\n\n" + to_string(_rows) + "\n" + to_string(_columns) + "\n\n"
+		+ to_string(playerPosX) + "\n" + to_string(playerPosY) + "\n\n"
+		+ to_string(_escapeX) + "\n" + to_string(_escapeY) + "\n\n"
+		+ to_string(playerHealth) + "\n" + to_string(playerMoney) + "\n" + to_string(playerArtifacts) + "\n\n"
+		+ to_string(_numberOfArtifacts) + "\n\n";
 
 	for (int i = 0; i < _rows; i++) {
-		saveFile << _levelGrid[i];
+		output += _levelGrid[i];
 
 		if (i < _rows - 1) {
-			saveFile << endl;
+			output += "\n";
 		}
 	}
+
+	saveFile << output;
+
 	saveFile.close();
 }
 
