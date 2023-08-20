@@ -58,11 +58,12 @@ void Camera::render() {
 	cout << _screenIndentTop;
 
 	int legendIterator = 0;
+	string levelString = "";
 
 	for (int y = _posY - 1; y <= _posY + CAMERA_HEIGHT; y++) {
 
 		if (y == _posY - 1 || y == _posY + CAMERA_HEIGHT) {
-			cout << _screenIndentLeft << ' ' << _topAndBottomLine;
+			levelString += _screenIndentLeft + " " + _topAndBottomLine;
 		}
 		else {
 			for (int x = _posX - 1; x <= _posX + CAMERA_WIDTH; x++) {
@@ -70,22 +71,22 @@ void Camera::render() {
 				if (x == _posX - 1 || x == _posX + CAMERA_WIDTH) {
 
 					if (x == _posX - 1) {
-						cout << _screenIndentLeft;
+						levelString += _screenIndentLeft;
 					}
 					
-					cout << '|';
+					levelString += "|";
 
 					if (x == _posX + CAMERA_WIDTH && y >= 0 && legendIterator < _legend.size()) {
-						cout << "  " << _legend[legendIterator++];
+						levelString += "  " + _legend[legendIterator++];
 					}
 				}
 				else {
-					cout << _currentLevel->getPositionAtGrid(x, y);
+					levelString += _currentLevel->getPositionAtGrid(x, y);
 				}
 			}
 		}
-		cout << endl;
+		levelString += "\n";
 	}
-	//cout << _screenIndentBottom;
-	cout << endl;
+	levelString += "\n";
+	cout << levelString;
 }
