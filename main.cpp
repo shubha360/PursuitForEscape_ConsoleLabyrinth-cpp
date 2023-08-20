@@ -1,12 +1,10 @@
-#include <iostream>
 #include <conio.h>
 
-#include "include/GameManager.h"
+#include "include/Player.h"
 
 using namespace std;
 
 int main() {
-
 	string name = "Pursuit For Escape: Console Labyrinth";
 	string signs = string(name.size(), '-');
 	string emptyLines = string(2, '\n');

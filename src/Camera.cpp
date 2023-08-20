@@ -1,7 +1,5 @@
 #include "../include/Camera.h"
 
-#include <iostream>
-
 const int Camera::CAMERA_WIDTH = 40;
 const int Camera::CAMERA_HEIGHT = 20;
 

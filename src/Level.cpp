@@ -1,8 +1,5 @@
 #include "../include/Level.h"
 
-#include <fstream>
-#include <iostream>
-
 const char Level::SIGN_EMPTY = ' ';
 const char Level::SIGN_WALL = '#';
 const char Level::SIGN_GATE_WALL = '=';

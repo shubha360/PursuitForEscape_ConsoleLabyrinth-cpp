@@ -3,8 +3,6 @@
 #include "Level.h"
 #include "Camera.h"
 
-#include <sstream>
-
 class Player {
 public:
 	static const int PLAYER_HEALTH;
