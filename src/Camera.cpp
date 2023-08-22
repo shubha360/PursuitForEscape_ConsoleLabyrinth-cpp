@@ -32,6 +32,7 @@ Camera::Camera(Level* level) {
 	_currentLevel = level;
 }
 
+// center the camera according to player's xy coordinate
 void Camera::setCameraPosition(int x, int y) {
 	_posY = y - CAMERA_HEIGHT / 2;
 
@@ -52,6 +53,7 @@ void Camera::setCameraPosition(int x, int y) {
 	}
 }
 
+// render the view inside camera
 void Camera::render() {
 	cout << _screenIndentTop;
 
@@ -60,12 +62,16 @@ void Camera::render() {
 
 	for (int y = _posY - 1; y <= _posY + CAMERA_HEIGHT; y++) {
 
+		// print top and bottom borders
 		if (y == _posY - 1 || y == _posY + CAMERA_HEIGHT) {
 			levelString += _screenIndentLeft + " " + _topAndBottomLine;
 		}
-		else {
+
+		// else print level lines
+		else { 
 			for (int x = _posX - 1; x <= _posX + CAMERA_WIDTH; x++) {
 				
+				// print left and right borders
 				if (x == _posX - 1 || x == _posX + CAMERA_WIDTH) {
 
 					if (x == _posX - 1) {
@@ -74,10 +80,13 @@ void Camera::render() {
 					
 					levelString += "|";
 
+					// print legend at the right of the game view
 					if (x == _posX + CAMERA_WIDTH && y >= 0 && legendIterator < _legend.size()) {
 						levelString += "  " + _legend[legendIterator++];
 					}
 				}
+
+				// else print level characters
 				else {
 					levelString += _currentLevel->getPositionAtGrid(x, y);
 				}

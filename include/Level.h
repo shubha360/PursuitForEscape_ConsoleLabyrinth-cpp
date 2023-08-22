@@ -24,11 +24,12 @@ public:
 	bool loadLevel(string currentFileLocation);
 	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts);
 	void deleteSaveGame();
-	void printLevel();
-	char getPositionAtGrid(int x, int y);
-	void setPlayer(int newX, int newY);
-	void setPlayer(int newX, int newY, int oldX, int oldY);
-	void openEscapeGate();
+	char getPositionAtGrid(int x, int y); // get the character at xy coordinate
+	void setPlayer(int newX, int newY); // set player at xy coordinate
+	void setPlayer(int newX, int newY, int oldX, int oldY); // set player at new xy coordinate and reset old xy coordinate
+	void openEscapeGate(); // open the escape gate when all artifacts are collected
+
+	void printLevel(); // print whole level at once
 
 	string getLevelFileLocation() { return _levelFileLocation; }
 

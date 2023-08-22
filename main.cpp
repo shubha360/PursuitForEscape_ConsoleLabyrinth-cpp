@@ -5,6 +5,8 @@
 using namespace std;
 
 int main() {
+
+	// setting up the intro and main menu
 	string name = "Pursuit For Escape: Console Labyrinth";
 	string signs = string(name.size(), '-');
 	string emptyLines = string(2, '\n');

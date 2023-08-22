@@ -12,16 +12,11 @@ const string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
 const string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
 
 Level::Level(string levelFileLocation) {
-	_levelName = "NONE";
 	_levelFileLocation = levelFileLocation;
-	_rows = -1;
-	_columns = -1;
-	_numberOfArtifacts = -1;
 	_levelLoaded = false;
 }
 
 bool Level::loadLevel(string currentFileLocation) {
-
 	ifstream loadFile;
 	loadFile.open(currentFileLocation);
 
@@ -84,16 +79,13 @@ bool Level::loadLevel(string currentFileLocation) {
 			_levelGrid[i] = line;
 		}
 	}
-
 	_levelLoaded = true;
 	loadFile.close();
 	return true;
 }
 
 void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
-
 	ofstream saveFile;
-
 	saveFile.open(SAVE_FILE_LOCATION);
 
 	if (saveFile.fail()) {
@@ -113,9 +105,7 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 			output += "\n";
 		}
 	}
-
 	saveFile << output;
-
 	saveFile.close();
 }
 
@@ -131,6 +121,7 @@ void Level::deleteSaveGame() {
 	saveFile.close();
 }
 
+// print whole level at once
 void Level::printLevel() {
 	if (!_levelLoaded) {
 		cout << "Level not loaded!\n";
@@ -142,6 +133,7 @@ void Level::printLevel() {
 	}
 }
 
+// get the character at xy coordinate
 char Level::getPositionAtGrid(int x, int y) {
 	if (!_levelLoaded) {
 		cout << "Level not loaded!\n";
@@ -150,6 +142,7 @@ char Level::getPositionAtGrid(int x, int y) {
 	return _levelGrid[y][x];
 }
 
+// set player at xy coordinate
 void Level::setPlayer(int newX, int newY) {
 	if (!_levelLoaded) {
 		cout << "Level not loaded!\n";
@@ -159,6 +152,7 @@ void Level::setPlayer(int newX, int newY) {
 	}
 }
 
+// set player at new xy coordinate and reset old xy coordinate
 void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
 	if (!_levelLoaded) {
 		cout << "Level not loaded!\n";
@@ -169,6 +163,7 @@ void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
 	}
 }
 
+// open the escape gate once all artifacts are collected
 void Level::openEscapeGate() {
 	if (!_levelLoaded) {
 		cout << "Level not loaded!\n";

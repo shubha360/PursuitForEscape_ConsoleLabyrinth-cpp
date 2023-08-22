@@ -8,8 +8,8 @@ public:
 	static const int CAMERA_HEIGHT;
 
 	Camera(Level* level);
-	void setCameraPosition(int x, int y);
-	void render();
+	void setCameraPosition(int x, int y); // center the camera according to player's xy coordinate
+	void render(); // render the view inside camera
 
 private:
 	int _posX, _posY;

@@ -17,19 +17,20 @@ Player::Player(Level* level, Camera* camera) {
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
 
 	_currentLevel->setPlayer(_posX, _posY);
-
 	_camera->setCameraPosition(_posX, _posY);
 }
 
 bool Player::movePlayer(char input) {
 	
+	// to determine if the game ended
 	bool continueGame = true;
 
+	// store the old player coordinates before moving
 	int oldX = _posX;
 	int oldY = _posY;
 
 	switch (input) {
-	case 'w':
+	case 'w': // move up
 		if (_currentLevel->getPositionAtGrid(_posX, _posY - 1) != Level::SIGN_WALL && 
 			_currentLevel->getPositionAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_WALL && 
 			_currentLevel->getPositionAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_OPEN) {
@@ -38,7 +39,7 @@ bool Player::movePlayer(char input) {
 		}
 		break;
 
-	case 's':
+	case 's': // move up
 		if (_currentLevel->getPositionAtGrid(_posX, _posY + 1) != Level::SIGN_WALL &&
 			_currentLevel->getPositionAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_WALL &&
 			_currentLevel->getPositionAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_LOCKED) {
@@ -47,7 +48,7 @@ bool Player::movePlayer(char input) {
 		}
 		break;
 
-	case 'a':
+	case 'a': // move up
 		if (_currentLevel->getPositionAtGrid(_posX - 1, _posY) != Level::SIGN_WALL &&
 			_currentLevel->getPositionAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_WALL &&
 			_currentLevel->getPositionAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_LOCKED) {
@@ -56,7 +57,7 @@ bool Player::movePlayer(char input) {
 		}
 		break;
 
-	case 'd':
+	case 'd': // move up
 		if (_currentLevel->getPositionAtGrid(_posX + 1, _posY) != Level::SIGN_WALL &&
 			_currentLevel->getPositionAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_WALL &&
 			_currentLevel->getPositionAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_LOCKED) {
@@ -76,6 +77,8 @@ bool Player::movePlayer(char input) {
 		}
 		else {
 			updatePlayerAfterGameStateChange();
+
+			// prevent triggering player moving functionality
 			oldX = _posX;
 			oldY = _posY;
 		}
@@ -84,6 +87,8 @@ bool Player::movePlayer(char input) {
 	case 'n': // new game
 		_currentLevel->loadLevel(_currentLevel->getLevelFileLocation());
 		updatePlayerAfterGameStateChange();
+
+		// prevent triggering player moving functionality
 		oldX = _posX;
 		oldY = _posY;
 		break;
@@ -97,16 +102,20 @@ bool Player::movePlayer(char input) {
 		break;
 	}
 
+	// different old and new coordinates mean player moved
 	if (_posX != oldX || _posY != oldY) {
 		
+		// collectced an artifact
 		if (_currentLevel->getPositionAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
 			_artifactsCollected++;
 
+			// open escape gate if all artifacts are collected
 			if (_artifactsCollected == _currentLevel->getNumberOfArtifacts()) {
 				_currentLevel->openEscapeGate();
 			}
 		}
 
+		// game is ended if player accessed the escape gate
 		if (_currentLevel->getPositionAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
 			continueGame = false;
 		}
