@@ -5,8 +5,6 @@
 #include <fstream>
 #include <iostream>
 
-using namespace std;
-
 class Level {
 public:
 	static const char SIGN_EMPTY;
@@ -17,11 +15,12 @@ public:
 	static const char SIGN_PLAYER;
 	static const char SIGN_ARTIFACT;
 
-	static const string SAVE_FILE_LOCATION;
-	static const string SAVE_FILE_DEFAULT_TEXT;
+	static const std::string SAVE_FILE_LOCATION;
+	static const std::string SAVE_FILE_DEFAULT_TEXT;
 
-	Level(string levelFileLocation);
-	bool loadLevel(string currentFileLocation);
+	Level();
+	Level(std::string levelFileLocation);
+	bool loadLevel(std::string currentFileLocation);
 	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts);
 	void deleteSaveGame();
 	char getPositionAtGrid(int x, int y); // get the character at xy coordinate
@@ -31,7 +30,7 @@ public:
 
 	void printLevel(); // print whole level at once
 
-	string getLevelFileLocation() { return _levelFileLocation; }
+	std::string getLevelFileLocation() { return _levelFileLocation; }
 
 	int getRows() { return _rows; }
 	int getColumns() { return _columns; }
@@ -46,9 +45,12 @@ public:
 	int getArtifactsCollected() { return _artifactsCollected; }
 
 private:
-	string _levelName;
-	string _levelFileLocation;
-	vector<string> _levelGrid;
+	std::string _levelName;
+	std::string _levelFileLocation;
+	std::vector<std::string> _levelGrid;
+
+	std::ifstream _inputStream;
+	std::ofstream _outputStream;
 
 	int _rows, _columns;
 	int _playerX, _playerY;

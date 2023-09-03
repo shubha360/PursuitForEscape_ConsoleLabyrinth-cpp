@@ -1,9 +1,19 @@
 #include "../include/Player.h"
 
-#include <iostream>
-
 const int Player::PLAYER_HEALTH = 100;
 const int Player::PLAYER_STARTING_MONEY = 100;
+
+Player::Player() {
+	_currentLevel = nullptr;
+	_camera = nullptr;
+
+	_posX = -1;
+	_posY = -1;
+
+	_currentHealth = -1;
+	_money = -1;
+	_artifactsCollected = -1;
+}
 
 Player::Player(Level* level, Camera* camera) {
 	_currentLevel = level;
@@ -73,7 +83,7 @@ bool Player::movePlayer(char input) {
 
 	case 'm': // load game
 		if (!_currentLevel->loadLevel(Level::SAVE_FILE_LOCATION)) {
-			cout << "No load game exists!\n\n";
+			std::cout << "No load game exists!\n\n";
 		}
 		else {
 			updatePlayerAfterGameStateChange();
@@ -105,7 +115,7 @@ bool Player::movePlayer(char input) {
 	// different old and new coordinates mean player moved
 	if (_posX != oldX || _posY != oldY) {
 		
-		// collectced an artifact
+		// collected an artifact
 		if (_currentLevel->getPositionAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
 			_artifactsCollected++;
 
@@ -131,14 +141,14 @@ bool Player::movePlayer(char input) {
 
 void Player::printPlayerInfo() {
 
-	string infoStr = "Health: " + to_string(_currentHealth)
+	std::string infoStr = "Health: " + std::to_string(_currentHealth)
 		+ "                | WASD - Player movement | N - New game\n"
-		+ "Money: " + to_string(_money)
+		+ "Money: " + std::to_string(_money)
 		+ "                 | J - Save game          | L - Delete Save Game\n"
-		+ "Artifacts Collected: " + to_string(_artifactsCollected) + " / " + to_string(_currentLevel->getNumberOfArtifacts())
+		+ "Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts())
 		+ " | M - Load game          | Esc - Exit game\n\n";
 
-	cout << infoStr;
+	std::cout << infoStr;
 }
 
 void Player::updatePlayerAfterGameStateChange() {

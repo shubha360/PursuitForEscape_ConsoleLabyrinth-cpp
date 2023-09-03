@@ -3,12 +3,12 @@
 const int Camera::CAMERA_WIDTH = 40;
 const int Camera::CAMERA_HEIGHT = 20;
 
-const string Camera::_topAndBottomLine = string(CAMERA_WIDTH, '-');
-const string Camera::_screenIndentTop = string(3, '\n');
-const string Camera::_screenIndentBottom = string(5, '\n');
-const string Camera::_screenIndentLeft = string(5, ' ');
+const std::string Camera::_topAndBottomLine = std::string(CAMERA_WIDTH, '-');
+const std::string Camera::_screenIndentTop = std::string(3, '\n');
+const std::string Camera::_screenIndentBottom = std::string(5, '\n');
+const std::string Camera::_screenIndentLeft = std::string(5, ' ');
 
-const vector<string> Camera::_legend = { 
+const std::vector<std::string> Camera::_legend = {
 	"#  Wall", 
 	"=  Escape Gate Wall", 
 	"X  Escape Gate Locked", 
@@ -25,6 +25,12 @@ const vector<string> Camera::_legend = {
 	"+  10 Health", 
 	"^  Shield For 5 Moves" 
 };
+
+Camera::Camera() {
+	_posX = -1;
+	_posY = -1;
+	_currentLevel = nullptr;
+}
 
 Camera::Camera(Level* level) {
 	_posX = 0;
@@ -55,10 +61,10 @@ void Camera::setCameraPosition(int x, int y) {
 
 // render the view inside camera
 void Camera::render() {
-	cout << _screenIndentTop;
+	std::cout << _screenIndentTop;
 
 	int legendIterator = 0;
-	string levelString = "";
+	std::string levelString = "";
 
 	for (int y = _posY - 1; y <= _posY + CAMERA_HEIGHT; y++) {
 
@@ -95,5 +101,5 @@ void Camera::render() {
 		levelString += "\n";
 	}
 	levelString += "\n";
-	cout << levelString;
+	std::cout << levelString;
 }

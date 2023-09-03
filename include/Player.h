@@ -8,6 +8,7 @@ public:
 	static const int PLAYER_HEALTH;
 	static const int PLAYER_STARTING_MONEY;
 
+	Player();
 	Player(Level* level, Camera* camera);
 	bool movePlayer(char input);
 	void printPlayerInfo();

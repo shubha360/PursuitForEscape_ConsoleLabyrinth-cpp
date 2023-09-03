@@ -8,69 +8,73 @@ const char Level::SIGN_GATE_OPEN = '~';
 const char Level::SIGN_PLAYER = '@';
 const char Level::SIGN_ARTIFACT = '!';
 
-const string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
-const string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
+const std::string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
+const std::string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
 
-Level::Level(string levelFileLocation) {
+Level::Level() {
+	_levelFileLocation = "";
+	_levelLoaded = false;
+}
+
+Level::Level(std::string levelFileLocation) {
 	_levelFileLocation = levelFileLocation;
 	_levelLoaded = false;
 }
 
-bool Level::loadLevel(string currentFileLocation) {
-	ifstream loadFile;
-	loadFile.open(currentFileLocation);
+bool Level::loadLevel(std::string currentFileLocation) {
+	_inputStream.open(currentFileLocation);
 
-	if (loadFile.fail()) {
+	if (_inputStream.fail()) {
 		perror(currentFileLocation.c_str());
 		return false;
 	}
 
-	string line;
+	std::string line;
 	
-	getline(loadFile, line);
+	getline(_inputStream, line);
 
 	if (line == SAVE_FILE_DEFAULT_TEXT) {
-		loadFile.close();
+		_inputStream.close();
 		return false;
 	}
 
 	_levelName = line;
-	getline(loadFile, line);
+	getline(_inputStream, line);
 
-	loadFile >> _rows;
-	getline(loadFile, line);
-	loadFile >> _columns;
-	getline(loadFile, line);
-	getline(loadFile, line);
+	_inputStream >> _rows;
+	getline(_inputStream, line);
+	_inputStream >> _columns;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
 
-	loadFile >> _playerX;
-	getline(loadFile, line);
-	loadFile >> _playerY;
-	getline(loadFile, line);
-	getline(loadFile, line);
+	_inputStream >> _playerX;
+	getline(_inputStream, line);
+	_inputStream >> _playerY;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
 
-	loadFile >> _escapeX;
-	getline(loadFile, line);
-	loadFile >> _escapeY;
-	getline(loadFile, line);
-	getline(loadFile, line);
+	_inputStream >> _escapeX;
+	getline(_inputStream, line);
+	_inputStream >> _escapeY;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
 
-	loadFile >> _playerHealth;
-	getline(loadFile, line);
+	_inputStream >> _playerHealth;
+	getline(_inputStream, line);
 
-	loadFile >> _playerMoney;
-	getline(loadFile, line);
+	_inputStream >> _playerMoney;
+	getline(_inputStream, line);
 
-	loadFile >> _artifactsCollected;
-	getline(loadFile, line);
-	getline(loadFile, line);
+	_inputStream >> _artifactsCollected;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
 
-	loadFile >> _numberOfArtifacts;
-	getline(loadFile, line);
-	getline(loadFile, line);
+	_inputStream >> _numberOfArtifacts;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
 
 	for (int i = 0; i < _rows; i++) {
-		getline(loadFile, line);
+		getline(_inputStream, line);
 
 		if (_levelGrid.size() < _rows) {
 			_levelGrid.push_back(line);
@@ -80,23 +84,22 @@ bool Level::loadLevel(string currentFileLocation) {
 		}
 	}
 	_levelLoaded = true;
-	loadFile.close();
+	_inputStream.close();
 	return true;
 }
 
 void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
-	ofstream saveFile;
-	saveFile.open(SAVE_FILE_LOCATION);
+	_outputStream.open(SAVE_FILE_LOCATION);
 
-	if (saveFile.fail()) {
+	if (_outputStream.fail()) {
 		perror(SAVE_FILE_LOCATION.c_str());
 	}
 
-	string output = _levelName + "\n\n" + to_string(_rows) + "\n" + to_string(_columns) + "\n\n"
-		+ to_string(playerPosX) + "\n" + to_string(playerPosY) + "\n\n"
-		+ to_string(_escapeX) + "\n" + to_string(_escapeY) + "\n\n"
-		+ to_string(playerHealth) + "\n" + to_string(playerMoney) + "\n" + to_string(playerArtifacts) + "\n\n"
-		+ to_string(_numberOfArtifacts) + "\n\n";
+	std::string output = _levelName + "\n\n" + std::to_string(_rows) + "\n" + std::to_string(_columns) + "\n\n"
+		+ std::to_string(playerPosX) + "\n" + std::to_string(playerPosY) + "\n\n"
+		+ std::to_string(_escapeX) + "\n" + std::to_string(_escapeY) + "\n\n"
+		+ std::to_string(playerHealth) + "\n" + std::to_string(playerMoney) + "\n" + std::to_string(playerArtifacts) + "\n\n"
+		+ std::to_string(_numberOfArtifacts) + "\n\n";
 
 	for (int i = 0; i < _rows; i++) {
 		output += _levelGrid[i];
@@ -105,30 +108,29 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 			output += "\n";
 		}
 	}
-	saveFile << output;
-	saveFile.close();
+	_outputStream << output;
+	_outputStream.close();
 }
 
 void Level::deleteSaveGame() {
-	ofstream saveFile;
-	saveFile.open(SAVE_FILE_LOCATION);
+	_outputStream.open(SAVE_FILE_LOCATION);
 
-	if (saveFile.fail()) {
+	if (_outputStream.fail()) {
 		perror(SAVE_FILE_LOCATION.c_str());
 	}
 
-	saveFile << SAVE_FILE_DEFAULT_TEXT;
-	saveFile.close();
+	_outputStream << SAVE_FILE_DEFAULT_TEXT;
+	_outputStream.close();
 }
 
 // print whole level at once
 void Level::printLevel() {
 	if (!_levelLoaded) {
-		cout << "Level not loaded!\n";
+		std::cout << "Level not loaded!\n";
 	}
 	else {
 		for (int i = 0; i < _rows; i++) {
-			cout << _levelGrid[i] << endl;
+			std::cout << _levelGrid[i] << std::endl;
 		}
 	}
 }
@@ -136,7 +138,7 @@ void Level::printLevel() {
 // get the character at xy coordinate
 char Level::getPositionAtGrid(int x, int y) {
 	if (!_levelLoaded) {
-		cout << "Level not loaded!\n";
+		std::cout << "Level not loaded!\n";
 		return SIGN_WALL;
 	}
 	return _levelGrid[y][x];
@@ -145,7 +147,7 @@ char Level::getPositionAtGrid(int x, int y) {
 // set player at xy coordinate
 void Level::setPlayer(int newX, int newY) {
 	if (!_levelLoaded) {
-		cout << "Level not loaded!\n";
+		std::cout << "Level not loaded!\n";
 	}
 	else {
 		_levelGrid[newY][newX] = SIGN_PLAYER;
@@ -155,7 +157,7 @@ void Level::setPlayer(int newX, int newY) {
 // set player at new xy coordinate and reset old xy coordinate
 void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
 	if (!_levelLoaded) {
-		cout << "Level not loaded!\n";
+		std::cout << "Level not loaded!\n";
 	}
 	else {
 		_levelGrid[oldY][oldX] = SIGN_EMPTY;
@@ -166,7 +168,7 @@ void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
 // open the escape gate once all artifacts are collected
 void Level::openEscapeGate() {
 	if (!_levelLoaded) {
-		cout << "Level not loaded!\n";
+		std::cout << "Level not loaded!\n";
 	}
 	else {
 		_levelGrid[_escapeY][_escapeX] = SIGN_GATE_OPEN;
