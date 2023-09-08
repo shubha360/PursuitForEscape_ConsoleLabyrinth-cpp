@@ -94,7 +94,7 @@ void Camera::render() {
 
 				// else print level characters
 				else {
-					levelString += _currentLevel->getPositionAtGrid(x, y);
+					levelString += _currentLevel->getTileAtGrid(x, y);
 				}
 			}
 		}

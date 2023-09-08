@@ -41,39 +41,43 @@ bool Player::movePlayer(char input) {
 
 	switch (input) {
 	case 'w': // move up
-		if (_currentLevel->getPositionAtGrid(_posX, _posY - 1) != Level::SIGN_WALL && 
-			_currentLevel->getPositionAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_WALL && 
-			_currentLevel->getPositionAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_OPEN) {
+		if (_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_WALL && 
+			_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_WALL && 
+			_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_OPEN) {
 			
 			_posY--;
 		}
+		_currentLevel->moveEnemies(_posX, _posY);
 		break;
 
-	case 's': // move up
-		if (_currentLevel->getPositionAtGrid(_posX, _posY + 1) != Level::SIGN_WALL &&
-			_currentLevel->getPositionAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getPositionAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_LOCKED) {
+	case 's': // move down
+		if (_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_WALL &&
+			_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_WALL &&
+			_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_LOCKED) {
 			
 			_posY++;
 		}
+		_currentLevel->moveEnemies(_posX, _posY);
 		break;
 
-	case 'a': // move up
-		if (_currentLevel->getPositionAtGrid(_posX - 1, _posY) != Level::SIGN_WALL &&
-			_currentLevel->getPositionAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getPositionAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_LOCKED) {
+	case 'a': // move left
+		if (_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_WALL &&
+			_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_WALL &&
+			_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_LOCKED) {
 			
 			_posX--;
 		}
+		_currentLevel->moveEnemies(_posX, _posY);
 		break;
 
-	case 'd': // move up
-		if (_currentLevel->getPositionAtGrid(_posX + 1, _posY) != Level::SIGN_WALL &&
-			_currentLevel->getPositionAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getPositionAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_LOCKED) {
+	case 'd': // move right
+		if (_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_WALL &&
+			_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_WALL &&
+			_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_LOCKED) {
 			
 			_posX++;
 		}
+		_currentLevel->moveEnemies(_posX, _posY);
 		break;
 
 	case 'j': // save game
@@ -116,23 +120,44 @@ bool Player::movePlayer(char input) {
 	if (_posX != oldX || _posY != oldY) {
 		
 		// collected an artifact
-		if (_currentLevel->getPositionAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
+		if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
 			_artifactsCollected++;
 
 			// open escape gate if all artifacts are collected
 			if (_artifactsCollected == _currentLevel->getNumberOfArtifacts()) {
 				_currentLevel->openEscapeGate();
 			}
-		}
+		} 
+		else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SNAKE ||
+			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ZOMBIE ||
+			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_WITCH ||
+			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_MONSTER) {
 
+			_combatEnemy(_currentLevel->getEnemyGrid()[_posY][_posX]);
+
+			if (_currentLevel->getEnemyGrid()[_posY][_posX]->getStrikesNeeded() == 0) { // enemy died
+
+				_money += _currentLevel->getEnemyGrid()[_posY][_posX]->getMoney();
+
+				_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
+				_camera->setCameraPosition(_posX, _posY);
+			}
+			else if (_currentHealth <= 0) { // player died
+				continueGame = false;
+			}
+			else { // neither died
+				_posX = oldX;
+				_posY = oldY;
+			}
+		}
 		// game is ended if player accessed the escape gate
-		if (_currentLevel->getPositionAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
+		else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
 			continueGame = false;
 		}
-
-		_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
-		_camera->setCameraPosition(_posX, _posY);
-
+		else {
+			_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
+			_camera->setCameraPosition(_posX, _posY);
+		}
 		_camera->render();
 		printPlayerInfo();
 	}
@@ -164,4 +189,20 @@ void Player::updatePlayerAfterGameStateChange() {
 
 	_camera->render();
 	printPlayerInfo();
+}
+
+void Player::_combatEnemy(Enemy* enemy) {
+	static std::uniform_int_distribution<int> getAttacker(1, 2);
+
+	int attacker = getAttacker(Enemy::RandomEngine);
+
+	switch (attacker) {
+	case 1: // player attack
+		enemy->takeDamage();
+		break;
+
+	case 2: // enemy attack
+		_currentHealth -= enemy->getDamage();
+		break;
+	}
 }

@@ -28,5 +28,7 @@ private:
 	int _currentHealth;
 	int _money;
 	int _artifactsCollected;
+
+	void _combatEnemy(Enemy* enemy);
 };
 

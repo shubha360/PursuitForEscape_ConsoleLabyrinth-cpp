@@ -2,7 +2,7 @@
 
 GameManager::GameManager(std::string levelFileLocation) {
 	_state = GameStates::MAIN_MENU;
-	_level = Level(levelFileLocation);
+	_level.addLevelFile(levelFileLocation);
 	_levelLoaded = false;
 }
 
@@ -69,8 +69,9 @@ void GameManager::playGame() {
 			_player.printPlayerInfo();
 
 			do {
-				char input = _getch();
+				char input = _getch();				
 
+				// returns false if player died or the level is completed
 				if (!_player.movePlayer(input)) {
 					break;
 				}
@@ -80,7 +81,6 @@ void GameManager::playGame() {
 			break;
 		}
 	}
-
 	std::cout << "Game exited!\n\n";
 }
 

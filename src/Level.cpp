@@ -7,6 +7,10 @@ const char Level::SIGN_GATE_LOCKED = 'X';
 const char Level::SIGN_GATE_OPEN = '~';
 const char Level::SIGN_PLAYER = '@';
 const char Level::SIGN_ARTIFACT = '!';
+const char Level::SIGN_SNAKE = 'S';
+const char Level::SIGN_ZOMBIE = 'Z';
+const char Level::SIGN_WITCH = 'W';
+const char Level::SIGN_MONSTER = 'M';
 
 const std::string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
 const std::string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
@@ -16,9 +20,27 @@ Level::Level() {
 	_levelLoaded = false;
 }
 
-Level::Level(std::string levelFileLocation) {
+Level::~Level() {
+	_exit();
+}
+
+void Level::_exit() {
+	for (int i = 0; i < _enemyGrid.size(); i++) {
+		for (int j = 0; j < _enemyGrid[i].size(); j++) {
+			if (_enemyGrid[i][j] != nullptr) {
+				delete _enemyGrid[i][j];
+				_enemyGrid[i][j] = nullptr;
+			}
+		}
+	}
+
+	for (int i = 0; i < _enemies.size(); i++) {
+		_enemies[i] = nullptr;
+	}
+}
+
+void Level::addLevelFile(std::string levelFileLocation) {
 	_levelFileLocation = levelFileLocation;
-	_levelLoaded = false;
 }
 
 bool Level::loadLevel(std::string currentFileLocation) {
@@ -82,6 +104,33 @@ bool Level::loadLevel(std::string currentFileLocation) {
 		else {
 			_levelGrid[i] = line;
 		}
+
+		_enemyGrid.push_back(std::vector<Enemy*>());
+		_enemyGrid.back().resize(line.size(), nullptr);
+
+		for (int j = 0; j < line.size(); j++) {
+			switch (line[j]) {
+			case 'S':
+				_enemies.push_back(new Snake(j, i));
+				_enemyGrid[i][j] = _enemies.back();
+				break;
+
+			case 'Z':
+				_enemies.push_back(new Zombie(j, i));
+				_enemyGrid[i][j] = _enemies.back();
+				break;
+
+			case 'W':
+				_enemies.push_back(new Witch(j, i));
+				_enemyGrid[i][j] = _enemies.back();
+				break;
+
+			case 'M':
+				_enemies.push_back(new Monster(j, i));
+				_enemyGrid[i][j] = _enemies.back();
+				break;
+			}
+		}
 	}
 	_levelLoaded = true;
 	_inputStream.close();
@@ -123,6 +172,12 @@ void Level::deleteSaveGame() {
 	_outputStream.close();
 }
 
+void Level::moveEnemies(int playerX, int playerY) {
+	for (Enemy* enemy : _enemies) {
+		enemy->move(playerX, playerY, _levelGrid, _enemyGrid);
+	}
+}
+
 // print whole level at once
 void Level::printLevel() {
 	if (!_levelLoaded) {
@@ -136,7 +191,7 @@ void Level::printLevel() {
 }
 
 // get the character at xy coordinate
-char Level::getPositionAtGrid(int x, int y) {
+char Level::getTileAtGrid(int x, int y) {
 	if (!_levelLoaded) {
 		std::cout << "Level not loaded!\n";
 		return SIGN_WALL;
