@@ -52,7 +52,7 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	}
 
 	std::string line;
-	
+
 	getline(_inputStream, line);
 
 	if (line == SAVE_FILE_DEFAULT_TEXT) {
@@ -66,18 +66,6 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	_inputStream >> _rows;
 	getline(_inputStream, line);
 	_inputStream >> _columns;
-	getline(_inputStream, line);
-	getline(_inputStream, line);
-
-	_inputStream >> _playerX;
-	getline(_inputStream, line);
-	_inputStream >> _playerY;
-	getline(_inputStream, line);
-	getline(_inputStream, line);
-
-	_inputStream >> _escapeX;
-	getline(_inputStream, line);
-	_inputStream >> _escapeY;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
@@ -110,6 +98,17 @@ bool Level::loadLevel(std::string currentFileLocation) {
 
 		for (int j = 0; j < line.size(); j++) {
 			switch (line[j]) {
+
+            case '@':
+                _playerX = j;
+                _playerY = i;
+                break;
+
+            case 'X':
+                _escapeX = j;
+                _escapeY = i;
+                break;
+
 			case 'S':
 				_enemies.push_back(new Snake(j, i));
 				_enemyGrid[i][j] = _enemies.back();
@@ -145,8 +144,6 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 	}
 
 	std::string output = _levelName + "\n\n" + std::to_string(_rows) + "\n" + std::to_string(_columns) + "\n\n"
-		+ std::to_string(playerPosX) + "\n" + std::to_string(playerPosY) + "\n\n"
-		+ std::to_string(_escapeX) + "\n" + std::to_string(_escapeY) + "\n\n"
 		+ std::to_string(playerHealth) + "\n" + std::to_string(playerMoney) + "\n" + std::to_string(playerArtifacts) + "\n\n"
 		+ std::to_string(_numberOfArtifacts) + "\n\n";
 
@@ -174,7 +171,9 @@ void Level::deleteSaveGame() {
 
 void Level::moveEnemies(int playerX, int playerY) {
 	for (Enemy* enemy : _enemies) {
-		enemy->move(playerX, playerY, _levelGrid, _enemyGrid);
+        if (enemy->isALive()) {
+            enemy->move(playerX, playerY, _levelGrid, _enemyGrid);
+        }
 	}
 }
 

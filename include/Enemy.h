@@ -16,6 +16,9 @@ public:
 	int getStrikesNeeded() { return _strikesNeeded; }
 	int getDamage() { return _damage; }
 	int getMoney() { return _moneyToGain; }
+	bool isALive() { return _alive; }
+
+	void die() { _alive = false; }
 
 protected:
 	int _posX, _posY;
@@ -27,15 +30,21 @@ protected:
 	EnemyType _type;
 	char _sign;
 
-	bool _died;
+	bool _alive;
 
 private:
 	static std::random_device _seed;
 
-	void _moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
-	void _moveDown(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
-	void _moveLeft(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
-	void _moveRight(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+    bool _moveTowardsPlayers(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+    void _moveRandomly(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+
+    void _moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid); // move horizontally towards player
+    void _moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid); // move vertically towards player
+
+	bool _moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	bool _moveDown(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	bool _moveLeft(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	bool _moveRight(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 };
 
 class Snake : public Enemy {

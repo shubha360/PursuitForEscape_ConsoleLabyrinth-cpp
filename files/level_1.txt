@@ -3,30 +3,24 @@ Level 1
 30 - Rows
 60 - Columns
 
-3 - Player X
-2 - Player Y
-
-59 - Escape X
-27 - Escape Y
-
 100 - Player health (for saving)
 100 - Player money (for saving)
 0 - Number of artifacts collected (for saving)
 
 6 - Number of artifacts
-                                                                  
+
 ############################################################
 #                       #                                  #
-#  @                    #                                ! #
+#                       #                                ! #
 #                       #                                  #
 #                       #                                  #
-#                 !     #              #####################
+#         @       !     #              #####################
 #                       #              #                   #
-#                W      #              #   !               #
-#      Z                #              #                   #
+#                       #              #   !               #
+#                       #              #                   #
 #                       #              #              !    #
 #                                      #                   #
-#                M                     #                   #
+#                                      #                   #
 #########################              #                   #
 #                                      #                   #
 #   !                                  #                   #
