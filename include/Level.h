@@ -70,6 +70,6 @@ private:
 	bool _levelLoaded;
 	int _escapeX, _escapeY;
 
-	void _exit();
+	void _deleteEnemies();
 };
 

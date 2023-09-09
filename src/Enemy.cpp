@@ -20,12 +20,12 @@ bool Enemy::_moveTowardsPlayers(int playerX, int playerY, std::vector<std::strin
                 _moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
             }
             else {
-                if (_posY < playerY) {
+                if (playerY < _posY) {
                     if (!_moveUp(levelGrid, enemyGrid)) {
                         _moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
                     }
                 }
-                else if (_posY > playerY) {
+                else if (playerY > _posY) {
                     if (!_moveDown(levelGrid, enemyGrid)) {
                         _moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
                     }
@@ -37,17 +37,22 @@ bool Enemy::_moveTowardsPlayers(int playerX, int playerY, std::vector<std::strin
                 _moveVertically(playerX, playerY, levelGrid, enemyGrid);
             }
             else {
-                if (_posX < playerX) {
+                if (playerX < _posX) {
                     if (!_moveLeft(levelGrid, enemyGrid)) {
                         _moveVertically(playerX, playerY, levelGrid, enemyGrid);
                     }
                 }
-                else if (_posX > playerX) {
+                else if (playerX > _posX) {
                     if (!_moveRight(levelGrid, enemyGrid)) {
                         _moveVertically(playerX, playerY, levelGrid, enemyGrid);
                     }
                 }
             }
+		}
+		else {
+			if (!_moveVertically(playerX, playerY, levelGrid, enemyGrid)) {
+				_moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
+			}
 		}
         return true;
 	}
@@ -82,32 +87,33 @@ void Enemy::_moveRandomly(std::vector<std::string>& levelGrid, std::vector<std::
     }
 }
 
-void Enemy::_moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-    if (_posX < playerX) {
-        _moveLeft(levelGrid, enemyGrid);
+bool Enemy::_moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+    if (playerX < _posX) {
+        return _moveLeft(levelGrid, enemyGrid);
     }
-    else if (_posX > playerX) {
-        _moveRight(levelGrid, enemyGrid);
+    else if (playerX > _posX) {
+        return _moveRight(levelGrid, enemyGrid);
     }
 }
 
-void Enemy::_moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-    if (_posY < playerY) {
-        _moveDown(levelGrid, enemyGrid);
+bool Enemy::_moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+    if (playerY < _posY) {
+		return _moveUp(levelGrid, enemyGrid);
     }
-    else if (_posY > playerY) {
-        _moveUp(levelGrid, enemyGrid);
+    else if (playerY > _posY) {
+		return _moveDown(levelGrid, enemyGrid);
     }
 }
 
 bool Enemy::_moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	if (levelGrid[_posY - 1][_posX] == ' ') {
 		levelGrid[_posY][_posX] = ' ';
-		_posY--;
-		levelGrid[_posY][_posX] = _sign;
+		levelGrid[_posY - 1][_posX] = _sign;
 
-		enemyGrid[_posY][_posX] = enemyGrid[_posY + 1][_posX];
-		enemyGrid[_posY + 1][_posX] = nullptr;
+		enemyGrid[_posY - 1][_posX] = enemyGrid[_posY][_posX];
+		enemyGrid[_posY][_posX] = nullptr;
+
+		_posY--;
 		return true;
 	}
 	return false;
@@ -116,11 +122,12 @@ bool Enemy::_moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector
 bool Enemy::_moveDown(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	if (levelGrid[_posY + 1][_posX] == ' ') {
 		levelGrid[_posY][_posX] = ' ';
-		_posY++;
-		levelGrid[_posY][_posX] = _sign;
+		levelGrid[_posY + 1][_posX] = _sign;
 
-		enemyGrid[_posY][_posX] = enemyGrid[_posY - 1][_posX];
-		enemyGrid[_posY - 1][_posX] = nullptr;
+		enemyGrid[_posY + 1][_posX] = enemyGrid[_posY][_posX];
+		enemyGrid[_posY][_posX] = nullptr;
+
+		_posY++;
 		return true;
 	}
 	return false;
@@ -129,11 +136,12 @@ bool Enemy::_moveDown(std::vector<std::string>& levelGrid, std::vector<std::vect
 bool Enemy::_moveLeft(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	if (levelGrid[_posY][_posX - 1] == ' ') {
 		levelGrid[_posY][_posX] = ' ';
-		_posX--;
-		levelGrid[_posY][_posX] = _sign;
+		levelGrid[_posY][_posX - 1] = _sign;
 
-		enemyGrid[_posY][_posX] = enemyGrid[_posY][_posX + 1];
-		enemyGrid[_posY][_posX + 1] = nullptr;
+		enemyGrid[_posY][_posX - 1] = enemyGrid[_posY][_posX];
+		enemyGrid[_posY][_posX] = nullptr;
+
+		_posX--;
 		return true;
 	}
 	return false;
@@ -142,11 +150,12 @@ bool Enemy::_moveLeft(std::vector<std::string>& levelGrid, std::vector<std::vect
 bool Enemy::_moveRight(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	if (levelGrid[_posY][_posX + 1] == ' ') {
 		levelGrid[_posY][_posX] = ' ';
-		_posX++;
-		levelGrid[_posY][_posX] = _sign;
+		levelGrid[_posY][_posX + 1] = _sign;
 
-		enemyGrid[_posY][_posX] = enemyGrid[_posY][_posX - 1];
-		enemyGrid[_posY][_posX - 1] = nullptr;
+		enemyGrid[_posY][_posX + 1] = enemyGrid[_posY][_posX];
+		enemyGrid[_posY][_posX] = nullptr;
+
+		_posX++;
 		return true;
 	}
 	return false;

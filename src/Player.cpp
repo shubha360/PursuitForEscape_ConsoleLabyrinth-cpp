@@ -35,6 +35,9 @@ bool Player::movePlayer(char input) {
 	// to determine if the game ended
 	bool continueGame = true;
 
+	// to trigger enemy movement
+	bool moveEnemies = false;
+
 	// store the old player coordinates before moving
 	int oldX = _posX;
 	int oldY = _posY;
@@ -47,7 +50,7 @@ bool Player::movePlayer(char input) {
 
 			_posY--;
 		}
-		_currentLevel->moveEnemies(_posX, _posY);
+		moveEnemies = true;
 		break;
 
 	case 's': // move down
@@ -57,7 +60,7 @@ bool Player::movePlayer(char input) {
 
 			_posY++;
 		}
-		_currentLevel->moveEnemies(_posX, _posY);
+		moveEnemies = true;
 		break;
 
 	case 'a': // move left
@@ -67,7 +70,7 @@ bool Player::movePlayer(char input) {
 
 			_posX--;
 		}
-		_currentLevel->moveEnemies(_posX, _posY);
+		moveEnemies = true;
 		break;
 
 	case 'd': // move right
@@ -77,7 +80,7 @@ bool Player::movePlayer(char input) {
 
 			_posX++;
 		}
-		_currentLevel->moveEnemies(_posX, _posY);
+		moveEnemies = true;
 		break;
 
 	case 'j': // save game
@@ -166,9 +169,16 @@ bool Player::movePlayer(char input) {
 			_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
 			_camera->setCameraPosition(_posX, _posY);
 		}
-		_camera->render();
-		printPlayerInfo();
 	}
+
+	// move enemies
+	if (moveEnemies) {
+		_currentLevel->moveEnemies(_posX, _posY);
+	}
+
+	_camera->render();
+	printPlayerInfo();
+
 	return continueGame;
 }
 

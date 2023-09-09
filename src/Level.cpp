@@ -21,10 +21,10 @@ Level::Level() {
 }
 
 Level::~Level() {
-	_exit();
+	_deleteEnemies();
 }
 
-void Level::_exit() {
+void Level::_deleteEnemies() {
 	for (int i = 0; i < _enemyGrid.size(); i++) {
 		for (int j = 0; j < _enemyGrid[i].size(); j++) {
 			if (_enemyGrid[i][j] != nullptr) {
@@ -37,6 +37,7 @@ void Level::_exit() {
 	for (int i = 0; i < _enemies.size(); i++) {
 		_enemies[i] = nullptr;
 	}
+	_enemies.clear();
 }
 
 void Level::addLevelFile(std::string levelFileLocation) {
@@ -44,6 +45,8 @@ void Level::addLevelFile(std::string levelFileLocation) {
 }
 
 bool Level::loadLevel(std::string currentFileLocation) {
+	_deleteEnemies();
+
 	_inputStream.open(currentFileLocation);
 
 	if (_inputStream.fail()) {
