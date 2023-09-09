@@ -16,11 +16,6 @@ private:
 	int _posX, _posY;
 	Level* _currentLevel;
 
-	static const std::string _topAndBottomLine;
-	static const std::string _screenIndentTop;
-	static const std::string _screenIndentBottom;
-	static const std::string _screenIndentLeft;
-
 	static const std::vector<std::string> _legend;
 };
 

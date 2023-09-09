@@ -86,11 +86,13 @@ bool Player::movePlayer(char input) {
 	case 'j': // save game
 
 		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
+		_addLog("Game saved");
 		break;
 
 	case 'm': // load game
 		if (!_currentLevel->loadLevel(Level::SAVE_FILE_LOCATION)) {
-			std::cout << "No load game exists!\n\n";
+			_addLog("No load game exists");
+			// std::cout << "No load game exists!\n\n";
 		}
 		else {
 			updatePlayerAfterGameStateChange();
@@ -98,6 +100,7 @@ bool Player::movePlayer(char input) {
 			// prevent triggering player moving functionality
 			oldX = _posX;
 			oldY = _posY;
+			_addLog("Game loaded");
 		}
 		break;
 
@@ -108,14 +111,17 @@ bool Player::movePlayer(char input) {
 		// prevent triggering player moving functionality
 		oldX = _posX;
 		oldY = _posY;
+		_addLog("Started new game");
 		break;
 
 	case 'l': // delete save game
 		_currentLevel->deleteSaveGame();
+		_addLog("Save game deleted");
 		break;
 
 	case 27: // exit game
 		continueGame = false;
+		_addLog("Game exited");
 		break;
 	}
 
@@ -135,12 +141,14 @@ bool Player::movePlayer(char input) {
 
 				_money += currentEnemy->getMoney();
                 currentEnemy->die();
+				_addLog("A " + currentEnemy->getName() + " died. Got " + std::to_string(currentEnemy->getMoney()) + " currency.");
 
 				_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
 				_camera->setCameraPosition(_posX, _posY);
 			}
 			else if (_currentHealth <= 0) { // player died
 				continueGame = false;
+				_addLog("Player died!");
 			}
 			else { // neither died
 				_posX = oldX;
@@ -151,10 +159,13 @@ bool Player::movePlayer(char input) {
             // collected an artifact
             if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
                 _artifactsCollected++;
+				_addLog("Artifact collected");
 
                 // open escape gate if all artifacts are collected
                 if (_artifactsCollected == _currentLevel->getNumberOfArtifacts()) {
                     _currentLevel->openEscapeGate();
+					_addLog("All artifacts collected");
+					_addLog("Escape gate opened");
                 }
 
                 _currentLevel->setPlayer(_posX, _posY, oldX, oldY);
@@ -164,6 +175,7 @@ bool Player::movePlayer(char input) {
             // game is ended if player accessed the escape gate
             if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
                 continueGame = false;
+				_addLog("Escaped!");
             }
 
 			_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
@@ -183,13 +195,12 @@ bool Player::movePlayer(char input) {
 }
 
 void Player::printPlayerInfo() {
+	static int logLineWidth = 35;
 
-	std::string infoStr = "Health: " + std::to_string(_currentHealth)
-		+ "                | WASD - Player movement | N - New game\n"
-		+ "Money: " + std::to_string(_money)
-		+ "                 | J - Save game          | L - Delete Save Game\n"
-		+ "Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts())
-		+ " | M - Load game          | Esc - Exit game\n\n";
+	std::string infoStr = "> " + _playerLog[0] + std::string(logLineWidth - _playerLog[0].size(), ' ') + " | Health: " + std::to_string(_currentHealth) + "\n"
+		+ "> " + _playerLog[1] + std::string(logLineWidth - _playerLog[1].size(), ' ') + " | Money: " + std::to_string(_money) + "\n"
+		+ "> " + _playerLog[2] + std::string(logLineWidth - _playerLog[2].size(), ' ') + " | Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts()) + "\n"
+		+ "> " + _playerLog[3] + std::string(logLineWidth - _playerLog[3].size(), ' ') + " |\n";
 
 	std::cout << infoStr;
 }
@@ -217,12 +228,44 @@ void Player::_combatEnemy(Enemy* enemy) {
 
         switch (attacker) {
         case 1: // player attack
-            enemy->takeDamage();
+			enemy->takeDamage();
+			_addLog("Attacked a " + enemy->getName());
             break;
 
         case 2: // enemy attack
             _currentHealth -= enemy->getDamage();
+			_addLog("Taken " + std::to_string(enemy->getDamage()) + " damage from " + enemy->getName());
             break;
         }
     }
+}
+
+//std::string Player::_processAttackFromEnemy(Enemy* enemy) {
+//	std::string enemyName;
+//
+//	switch (enemy->getType()) {
+//	case EnemyType::SNAKE:
+//		enemyName = "snake";
+//		break;
+//
+//	case EnemyType::ZOMBIE:
+//		enemyName = "zombie";
+//		break;
+//	
+//	case EnemyType::WITCH:
+//		enemyName = "witch";
+//		break;
+//
+//	case EnemyType::MONSTER:
+//		enemyName = "monster";
+//		break;
+//	}
+//	return enemyName;
+//}
+
+void Player::_addLog(std::string logText) {
+	for (int i = 2; i >= 0; i--) {
+		_playerLog[i + 1] = _playerLog[i];
+	}
+	_playerLog[0] = logText;
 }

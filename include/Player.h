@@ -29,6 +29,11 @@ private:
 	int _money;
 	int _artifactsCollected;
 
+	std::string _playerLog[4] {"", "", "", ""};
+
 	void _combatEnemy(Enemy* enemy);
+	//std::string _processAttackFromEnemy(Enemy* enemy);
+
+	void _addLog(std::string logText);
 };
 

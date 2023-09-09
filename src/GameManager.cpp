@@ -48,6 +48,7 @@ void GameManager::playGame() {
 
 				case '3': // quit
 					_state = GameStates::EXIT;
+					std::cout << "Game exited!\n\n";
 					break;
 
 				default:
@@ -81,7 +82,6 @@ void GameManager::playGame() {
 			break;
 		}
 	}
-	std::cout << "Game exited!\n\n";
 }
 
 void GameManager::_printIntro() {

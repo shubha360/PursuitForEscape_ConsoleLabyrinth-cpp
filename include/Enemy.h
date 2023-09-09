@@ -16,6 +16,8 @@ public:
 	int getStrikesNeeded() { return _strikesNeeded; }
 	int getDamage() { return _damage; }
 	int getMoney() { return _moneyToGain; }
+	std::string getName() { return _name; }
+	EnemyType getType() { return _type; }
 	bool isALive() { return _alive; }
 
 	void die() { _alive = false; }
@@ -27,6 +29,7 @@ protected:
 	int _damage;
 	int _moneyToGain;
 
+	std::string _name;
 	EnemyType _type;
 	char _sign;
 

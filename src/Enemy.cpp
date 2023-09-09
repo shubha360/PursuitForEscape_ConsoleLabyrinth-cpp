@@ -167,6 +167,7 @@ Snake::Snake(int posX, int posY) {
 	_strikesNeeded = 1;
 	_damage = 10;
 	_moneyToGain = 20;
+	_name = "snake";
 	_type = EnemyType::SNAKE;
 	_sign = 'S';
 	_alive = true;
@@ -178,6 +179,7 @@ Zombie::Zombie(int posX, int posY) {
 	_strikesNeeded = 3;
 	_damage = 5;
 	_moneyToGain = 50;
+	_name = "zombie";
 	_type = EnemyType::ZOMBIE;
 	_sign = 'Z';
 	_alive = true;
@@ -189,6 +191,7 @@ Witch::Witch(int posX, int posY) {
 	_strikesNeeded = 2;
 	_damage = 30;
 	_moneyToGain = 120;
+	_name = "witch";
 	_type = EnemyType::WITCH;
 	_sign = 'W';
 	_alive = true;
@@ -200,6 +203,7 @@ Monster::Monster(int posX, int posY) {
 	_strikesNeeded = 5;
 	_damage = 45;
 	_moneyToGain = 200;
+	_name = "monster";
 	_type = EnemyType::MONSTER;
 	_sign = 'M';
 	_alive = true;
