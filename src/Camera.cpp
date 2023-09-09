@@ -3,27 +3,24 @@
 const int Camera::CAMERA_WIDTH = 40;
 const int Camera::CAMERA_HEIGHT = 20;
 
-const std::string Camera::_topAndBottomLine = std::string(CAMERA_WIDTH, '-');
-const std::string Camera::_screenIndentTop = std::string(3, '\n');
-const std::string Camera::_screenIndentBottom = std::string(5, '\n');
-const std::string Camera::_screenIndentLeft = std::string(5, ' ');
-
 const std::vector<std::string> Camera::_legend = {
-	"#  Wall", 
-	"=  Escape Gate Wall", 
-	"X  Escape Gate Locked", 
-	"~  Escape Gate Open", 
-	"!  Artifacts", 
-	"1  Shop", 
-	"2  Refill Health", 
-	"3  Map View", 
-	"S  Snake", 
-	"Z  Zombie", 
-	"W  Witch", 
-	"M  Monster", 
-	"$  Random Money", 
-	"+  10 Health", 
-	"^  Shield For 5 Moves" 
+	"Legends:                  Controls:",
+	"",
+	"#  Wall                 | WASD - Player movement", 
+	"=  Escape Gate Wall     | ", 
+	"X  Escape Gate Locked   | N - New game", 
+	"~  Escape Gate Open     | M - Load game", 
+	"!  Artifacts            | ",
+	"1  Shop                 | J - Save game", 
+	"2  Refill Health        | L - Delete Save Game", 
+	"3  Map View             | ", 
+	"S  Snake                | Esc - Exit game", 
+	"Z  Zombie               | ", 
+	"W  Witch                | ",
+	"M  Monster              | ", 
+	"$  Random Money         | ", 
+	"+  10 Health            | ", 
+	"^  Shield For an Attack | " 
 };
 
 Camera::Camera() {
@@ -61,7 +58,12 @@ void Camera::setCameraPosition(int x, int y) {
 
 // render the view inside camera
 void Camera::render() {
-	std::cout << _screenIndentTop;
+	static const std::string topAndBottomLine = std::string(CAMERA_WIDTH, '-');
+	static const std::string screenIndentTop = std::string(40, '\n');
+	static const std::string screenIndentBottom = std::string(5, '\n');
+	static const std::string screenIndentLeft = std::string(5, ' ');
+
+	std::cout << screenIndentTop;
 
 	int legendIterator = 0;
 	std::string levelString = "";
@@ -70,7 +72,7 @@ void Camera::render() {
 
 		// print top and bottom borders
 		if (y == _posY - 1 || y == _posY + CAMERA_HEIGHT) {
-			levelString += _screenIndentLeft + " " + _topAndBottomLine;
+			levelString += screenIndentLeft + " " + topAndBottomLine;
 		}
 
 		// else print level lines
@@ -81,7 +83,7 @@ void Camera::render() {
 				if (x == _posX - 1 || x == _posX + CAMERA_WIDTH) {
 
 					if (x == _posX - 1) {
-						levelString += _screenIndentLeft;
+						levelString += screenIndentLeft;
 					}
 					
 					levelString += "|";
