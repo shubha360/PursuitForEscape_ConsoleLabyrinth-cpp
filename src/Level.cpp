@@ -175,10 +175,12 @@ void Level::deleteSaveGame() {
 	_outputStream.close();
 }
 
-void Level::moveEnemies(int playerX, int playerY) {
+// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
+// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
+void Level::moveEnemies(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder) {
 	for (Enemy* enemy : _enemies) {
         if (enemy->isALive()) {
-            enemy->move(playerX, playerY, _levelGrid, _enemyGrid);
+            enemy->move(playerX, playerY, playerHealth, damageHolder, enemyNameHolder, _levelGrid, _enemyGrid);
         }
 	}
 }
@@ -223,6 +225,10 @@ void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
 		_levelGrid[oldY][oldX] = SIGN_EMPTY;
 		_levelGrid[newY][newX] = SIGN_PLAYER;
 	}
+}
+
+void Level::erasePlayer(int playerX, int playerY) {
+	_levelGrid[playerY][playerX] = SIGN_EMPTY;
 }
 
 // open the escape gate once all artifacts are collected

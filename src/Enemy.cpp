@@ -3,9 +3,43 @@
 std::random_device Enemy::_seed;
 std::mt19937 Enemy::RandomEngine(_seed());
 
-void Enemy::move(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-    if (!_moveTowardsPlayers(playerX, playerY, levelGrid, enemyGrid)) {
-	    _moveRandomly(levelGrid, enemyGrid);
+int Enemy::getDamage() {
+	return _generateDamage(RandomEngine);
+}
+
+// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
+// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
+void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+	
+	// attack if player is in a spot adjacent to this enemy
+	if ((playerX == _posX - 1 && playerY == _posY) ||
+		(playerX == _posX + 1 && playerY == _posY) ||
+		(playerX == _posX && playerY == _posY - 1) ||
+		(playerX == _posX && playerY == _posY + 1)) {
+		
+		if (_resting) { // don't attack if this enemy was in fight with player in the previous move from player
+			_resting = false;
+		}
+		else {
+			damageHolder = _generateDamage(RandomEngine);
+			enemyNameHolder = this->getName();
+
+			if (playerHealth - damageHolder <= 0) { // if player died, set this enemy's position to player's position
+				levelGrid[playerY][playerX] = _sign;
+				levelGrid[_posY][_posX] = ' ';
+
+				enemyGrid[playerY][playerX] = enemyGrid[_posY][_posX];
+				enemyGrid[_posY][_posX] = nullptr;
+
+				_posX = playerX;
+				_posY = playerY;
+			}
+		}
+	}
+	else {
+		if (!_moveTowardsPlayers(playerX, playerY, levelGrid, enemyGrid)) {
+			_moveRandomly(levelGrid, enemyGrid);
+		}
 	}
 }
 
@@ -164,47 +198,55 @@ bool Enemy::_moveRight(std::vector<std::string>& levelGrid, std::vector<std::vec
 Snake::Snake(int posX, int posY) {
 	_posX = posX;
 	_posY = posY;
-	_strikesNeeded = 1;
-	_damage = 10;
+	_minDamage = 15;
+	_maxDamage = 20;
 	_moneyToGain = 20;
 	_name = "snake";
 	_type = EnemyType::SNAKE;
 	_sign = 'S';
 	_alive = true;
+	_resting = false;
+	_generateDamage = std::uniform_int_distribution<int>(_minDamage, _maxDamage);
 }
 
 Zombie::Zombie(int posX, int posY) {
 	_posX = posX;
 	_posY = posY;
-	_strikesNeeded = 3;
-	_damage = 5;
+	_minDamage = 10;
+	_maxDamage = 15;
 	_moneyToGain = 50;
 	_name = "zombie";
 	_type = EnemyType::ZOMBIE;
 	_sign = 'Z';
 	_alive = true;
+	_resting = false;
+	_generateDamage = std::uniform_int_distribution<int>(_minDamage, _maxDamage);
 }
 
 Witch::Witch(int posX, int posY) {
 	_posX = posX;
 	_posY = posY;
-	_strikesNeeded = 2;
-	_damage = 30;
+	_minDamage = 40;
+	_maxDamage = 50;
 	_moneyToGain = 120;
 	_name = "witch";
 	_type = EnemyType::WITCH;
 	_sign = 'W';
 	_alive = true;
+	_resting = false;
+	_generateDamage = std::uniform_int_distribution<int>(_minDamage, _maxDamage);
 }
 
 Monster::Monster(int posX, int posY) {
 	_posX = posX;
 	_posY = posY;
-	_strikesNeeded = 5;
-	_damage = 45;
+	_minDamage = 75;
+	_maxDamage = 95;
 	_moneyToGain = 200;
 	_name = "monster";
 	_type = EnemyType::MONSTER;
 	_sign = 'M';
 	_alive = true;
+	_resting = false;
+	_generateDamage = std::uniform_int_distribution<int>(_minDamage, _maxDamage);
 }

@@ -126,8 +126,10 @@ void GameManager::_printHowToPlay() {
 		"But the escape gate remains locked until all the artifacts are collected. " 
 		"Also there are some ferocious enemies waiting to make a feast of the player! " 
 		"Player has to find all the artifacts killing or avoiding the enemies.\n\n"
-		"Player and an enemy fight each other if they are in the same spot in the labyrinth. " 
-		"It will be randomly determined who will attack whom." 
+		"Player and an enemy fight each other if they are in the same spot in the labyrinth or player moves to the adjacent spot to enemy. "
+		"Because, enemy makes it's move after player. "
+		"So if player is in the adjacent spot of enemy, enemy makes it's move towards the player's spot and fights player. "
+		"It will be randomly determined who will attack whom. " 
 		"Any enemy will be killed with a single attack. "
 		"Max health of player is 100 and game ends if the player dies from attack of an enemy.\n\n"
 		"There are various powerups available to collect or to buy from the shop. "
@@ -143,10 +145,10 @@ void GameManager::_printHowToPlay() {
 		"Total 35 damage at the worst case. "
 		"Player earns 50 currency for killing a zombie.\n\n"
 		
-		"Witch - Can deal 40 - 50 health damage to the player and take away all the powerups for good."
+		"Witch - Can deal 40 - 50 health damage to the player and take away all the powerups for good. "
 		"Player earns 120 currency for killing a witch.\n\n"
 
-		"Monster - Can deal 90 - 100 health damage to the player."
+		"Monster - The strongest one. Can deal 75 - 95 health damage to the player. "
 		"Player earns 200 currency for killing a monster.\n\n"
 
 		"\n\n\n"

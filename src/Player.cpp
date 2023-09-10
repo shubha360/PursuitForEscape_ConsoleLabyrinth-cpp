@@ -137,22 +137,23 @@ bool Player::movePlayer(char input) {
 
 			_combatEnemy(currentEnemy);
 
-			if (currentEnemy->getStrikesNeeded() == 0) { // enemy died
-
-				_money += currentEnemy->getMoney();
-                currentEnemy->die();
-				_addLog("A " + currentEnemy->getName() + " died. Got " + std::to_string(currentEnemy->getMoney()) + " currency.");
-
+			if (!currentEnemy->isALive()) { // enemy died
 				_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
 				_camera->setCameraPosition(_posX, _posY);
 			}
-			else if (_currentHealth <= 0) { // player died
-				continueGame = false;
-				_addLog("Player died!");
-			}
-			else { // neither died
+			else { // player took damage
+				
+				// player did not move
 				_posX = oldX;
 				_posY = oldY;
+				
+				if (_currentHealth <= 0) { // player died
+					_currentLevel->erasePlayer(oldX, oldY);
+					continueGame = false;
+					_addLog("Player died!");
+				}
+				
+				currentEnemy->setResting();
 			}
 		}
 		else {
@@ -185,7 +186,20 @@ bool Player::movePlayer(char input) {
 
 	// move enemies
 	if (moveEnemies) {
-		_currentLevel->moveEnemies(_posX, _posY);
+		int tempDamage = 0; // for getting damage dealt by a moving enemy
+		std::string tempName = ""; // for getting the name of the enemy
+
+		_currentLevel->moveEnemies(_posX, _posY, _currentHealth, tempDamage, tempName);
+
+		if (tempDamage > 0) { // enemy attacked the player
+			_currentHealth -= tempDamage;
+			_addLog("Taken " + std::to_string(tempDamage) + " damage from " + tempName);
+
+			if (_currentHealth <= 0) { // player died
+				continueGame = false;
+				_addLog("Player died!");
+			}
+		}
 	}
 
 	_camera->render();
@@ -195,7 +209,7 @@ bool Player::movePlayer(char input) {
 }
 
 void Player::printPlayerInfo() {
-	static int logLineWidth = 35;
+	static int logLineWidth = 40;
 
 	std::string infoStr = "> " + _playerLog[0] + std::string(logLineWidth - _playerLog[0].size(), ' ') + " | Health: " + std::to_string(_currentHealth) + "\n"
 		+ "> " + _playerLog[1] + std::string(logLineWidth - _playerLog[1].size(), ' ') + " | Money: " + std::to_string(_money) + "\n"
@@ -224,12 +238,14 @@ void Player::_combatEnemy(Enemy* enemy) {
     if (enemy->isALive()) {
         static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-        int attacker = getAttacker(Enemy::RandomEngine);
+        //int attacker = getAttacker(Enemy::RandomEngine);
+		int attacker = 2;
 
         switch (attacker) {
         case 1: // player attack
-			enemy->takeDamage();
-			_addLog("Attacked a " + enemy->getName());
+			enemy->die();
+			_money += enemy->getMoney();
+			_addLog("Attacked a " + enemy->getName() + ". Got " + std::to_string(enemy->getMoney()) + " currency.");
             break;
 
         case 2: // enemy attack

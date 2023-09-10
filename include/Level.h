@@ -31,8 +31,12 @@ public:
 	char getTileAtGrid(int x, int y); // get the character at xy coordinate
 	void setPlayer(int newX, int newY); // set player at xy coordinate
 	void setPlayer(int newX, int newY, int oldX, int oldY); // set player at new xy coordinate and reset old xy coordinate
+	void erasePlayer(int playerX, int playerY); // erase player from grid
 	void openEscapeGate(); // open the escape gate when all artifacts are collected
-	void moveEnemies(int playerX, int playerY);
+
+	// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
+	// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
+	void moveEnemies(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder);
 
 	void printLevel(); // print whole level at once
 
@@ -50,7 +54,8 @@ public:
 	int getPlayerMoney() { return _playerMoney; }
 	int getArtifactsCollected() { return _artifactsCollected; }
 
-	std::vector<std::vector<Enemy*>> getEnemyGrid() { return _enemyGrid; }
+	std::vector<std::string>& getLevelGrid() { return _levelGrid; }
+	std::vector<std::vector<Enemy*>>& getEnemyGrid() { return _enemyGrid; }
 
 private:
 	std::string _levelName;
