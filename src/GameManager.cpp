@@ -46,7 +46,11 @@ void GameManager::playGame() {
 					}
 					break;
 
-				case '3': // quit
+				case '3': // how to play
+					_state = GameStates::HOW_TO_PLAY;
+					break;
+
+				case '4': // quit
 					_state = GameStates::EXIT;
 					std::cout << "Game exited!\n\n";
 					break;
@@ -80,6 +84,19 @@ void GameManager::playGame() {
 
 			_state = GameStates::MAIN_MENU;
 			break;
+
+		case GameStates::HOW_TO_PLAY:
+			do {
+				_printHowToPlay();
+				std::cout << "Press any key to get back to the menu.\n\n";
+
+				char input = _getch();
+				break;
+
+			} while (true);
+
+			_state = GameStates::MAIN_MENU;
+			break;
 		}
 	}
 }
@@ -95,6 +112,67 @@ void GameManager::_printIntro() {
 }
 
 void GameManager::_printMainMenu() {
-	static const std::string menu = "1. New Game\n2. Load Game\n3. Exit Game\n\nYour input: ";
+	static const std::string menu = "1. New Game\n2. Load Game\n3. How to play\n4. Exit Game\n\nYour input: ";
 	std::cout << menu;
+}
+
+void GameManager::_printHowToPlay() {
+	
+	std::cout << std::string(40, '\n');
+	_printIntro();
+
+	std::string htp =
+		"The main purpose of the player is to escape the labyrinth through the escape gate. " 
+		"But the escape gate remains locked until all the artifacts are collected. " 
+		"Also there are some ferocious enemies waiting to make a feast of the player! " 
+		"Player has to find all the artifacts killing or avoiding the enemies.\n\n"
+		"Player and an enemy fight each other if they are in the same spot in the labyrinth. " 
+		"It will be randomly determined who will attack whom." 
+		"Any enemy will be killed with a single attack. "
+		"Max health of player is 100 and game ends if the player dies from attack of an enemy.\n\n"
+		"There are various powerups available to collect or to buy from the shop. "
+		"Money is used to buy powerups. Money can be found around the labyrinth and by killing enemies. "
+		"\n\n\n"
+		"There are 4 different type of enemies. Each has it's own characteristics and powers.\n\n"
+		
+		"Snake - The weakest one. Can deal 15 - 20 health damage to the player. " 
+		"Can be eaten after killing for gaining 5 health back. "
+		"Player earns 20 currency for killing a snake.\n\n"
+		
+		"Zombie - Can deal 10 - 15 health damage to the player at once and then 2 - 4 health damage for each next 5 moves. "
+		"Total 35 damage at the worst case. "
+		"Player earns 50 currency for killing a zombie.\n\n"
+		
+		"Witch - Can deal 40 - 50 health damage to the player and take away all the powerups for good."
+		"Player earns 120 currency for killing a witch.\n\n"
+
+		"Monster - Can deal 90 - 100 health damage to the player."
+		"Player earns 200 currency for killing a monster.\n\n"
+
+		"\n\n\n"
+		"Symbols:\n\n"
+		"@ - Player\n"
+		"# - Wall\n"
+		"= - Escape Gate Wall\n"
+		"X - Escape Gate Locked\n"
+		"~ - Escape Gate Unlocked\n"
+		"! - Artifact\n"
+		"S - Snake\n"
+		"Z - Zombie\n"
+		"W - Witch\n"
+		"M - Monster\n"
+		"\n\n\n"
+		"Controls:\n\n"
+		"W - Move Up\n"
+		"S - Move Down\n"
+		"A - Move Left\n"
+		"D - Move Right\n"
+		"N - New Game\n"
+		"M - Load Game\n"
+		"J - Save Game\n"
+		"L - Delete Save Game\n"
+		"Esc - Exit to main menu\n"
+		"\n\n";
+
+	std::cout << htp;
 }
