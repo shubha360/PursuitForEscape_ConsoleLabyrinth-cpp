@@ -24,6 +24,7 @@ Level::~Level() {
 	_deleteEnemies();
 }
 
+// deletes all the enemies and empties the enemy vector
 void Level::_deleteEnemies() {
 	for (int i = 0; i < _enemyGrid.size(); i++) {
 		for (int j = 0; j < _enemyGrid[i].size(); j++) {
@@ -45,7 +46,6 @@ void Level::addLevelFile(std::string levelFileLocation) {
 }
 
 bool Level::loadLevel(std::string currentFileLocation) {
-	_deleteEnemies();
 
 	_inputStream.open(currentFileLocation);
 
@@ -62,6 +62,9 @@ bool Level::loadLevel(std::string currentFileLocation) {
 		_inputStream.close();
 		return false;
 	}
+
+	// emptying the enemy vector and grid before filling data again
+	_deleteEnemies();
 
 	_levelName = line;
 	getline(_inputStream, line);

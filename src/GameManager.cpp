@@ -78,7 +78,7 @@ void GameManager::playGame() {
 				}
 			} while (true);
 
-			_state = GameStates::EXIT;
+			_state = GameStates::MAIN_MENU;
 			break;
 		}
 	}
