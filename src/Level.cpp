@@ -175,13 +175,40 @@ void Level::deleteSaveGame() {
 	_outputStream.close();
 }
 
-// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
-// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
-void Level::moveEnemies(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder) {
+// damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
+// enemyNameArr holds the name of the enemies
+// at most 3 enemies can attack the player
+void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], std::string enemyNameArr[]) {
+
+	// keeping count of the attacking enemies
+	int attackerCount = 0;
+
 	for (Enemy* enemy : _enemies) {
         if (enemy->isALive()) {
+			int damageHolder = 0;
+			std::string enemyNameHolder;
+
             enemy->move(playerX, playerY, playerHealth, damageHolder, enemyNameHolder, _levelGrid, _enemyGrid);
+
+			if (damageHolder > 0) { // this enemy attacked the player
+				damageArr[attackerCount] = damageHolder;
+				enemyNameArr[attackerCount] = enemyNameHolder;
+
+				playerHealth -= damageHolder;
+				attackerCount++;
+			}
+			else if (damageHolder == -1) { // this enemy was attacked by the player
+				damageArr[attackerCount] = damageHolder;
+				enemyNameArr[attackerCount] = enemyNameHolder;
+				attackerCount++;
+			}
         }
+	}
+
+	// if less then 3 enemies attacked, fill the remaining array spots with zero
+	while (attackerCount < 3) {
+		damageArr[attackerCount] = 0;
+		attackerCount++;
 	}
 }
 

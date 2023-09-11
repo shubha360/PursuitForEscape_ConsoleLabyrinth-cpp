@@ -9,6 +9,7 @@ int Enemy::getDamage() {
 
 // damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
 // enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
+// if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
 void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	
 	// attack if player is in a spot adjacent to this enemy
@@ -21,18 +22,38 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 			_resting = false;
 		}
 		else {
-			damageHolder = _generateDamage(RandomEngine);
-			enemyNameHolder = this->getName();
+			if (playerHealth > 0) {
 
-			if (playerHealth - damageHolder <= 0) { // if player died, set this enemy's position to player's position
-				levelGrid[playerY][playerX] = _sign;
-				levelGrid[_posY][_posX] = ' ';
+				static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-				enemyGrid[playerY][playerX] = enemyGrid[_posY][_posX];
-				enemyGrid[_posY][_posX] = nullptr;
+				 int attacker = getAttacker(RandomEngine);
+				//int attacker = 2;
 
-				_posX = playerX;
-				_posY = playerY;
+				switch (attacker) {
+				case 1: // enemy attack
+					damageHolder = _generateDamage(RandomEngine);
+					enemyNameHolder = this->getName();
+
+					if (playerHealth - damageHolder <= 0) { // if player died, set this enemy's position to player's position
+						levelGrid[playerY][playerX] = _sign;
+						levelGrid[_posY][_posX] = ' ';
+
+						enemyGrid[playerY][playerX] = enemyGrid[_posY][_posX];
+						enemyGrid[_posY][_posX] = nullptr;
+
+						_posX = playerX;
+						_posY = playerY;
+					}
+					break;
+
+				case 2: // player attack
+					damageHolder = -1;
+					enemyNameHolder = this->getName();
+
+					levelGrid[_posY][_posX] = ' ';
+					this->die();
+					break;
+				}
 			}
 		}
 	}

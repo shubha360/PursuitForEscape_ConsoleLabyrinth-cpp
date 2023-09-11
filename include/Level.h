@@ -34,9 +34,10 @@ public:
 	void erasePlayer(int playerX, int playerY); // erase player from grid
 	void openEscapeGate(); // open the escape gate when all artifacts are collected
 
-	// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
-	// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
-	void moveEnemies(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder);
+	// damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
+	// enemyNameArr holds the name of the enemies
+	// at most 3 enemies can attack the player
+	void moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], std::string enemyNameArr[]);
 
 	void printLevel(); // print whole level at once
 

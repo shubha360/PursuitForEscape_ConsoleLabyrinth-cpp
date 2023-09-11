@@ -186,19 +186,24 @@ bool Player::movePlayer(char input) {
 
 	// move enemies
 	if (moveEnemies) {
-		int tempDamage = 0; // for getting damage dealt by a moving enemy
-		std::string tempName = ""; // for getting the name of the enemy
+		int enemyDamageArr[3]; // for getting damage dealt by a moving enemy
+		std::string enemyNameArr[3]; // for getting the name of the enemy
 
-		_currentLevel->moveEnemies(_posX, _posY, _currentHealth, tempDamage, tempName);
+		_currentLevel->moveEnemies(_posX, _posY, _currentHealth, enemyDamageArr, enemyNameArr);
 
-		if (tempDamage > 0) { // enemy attacked the player
-			_currentHealth -= tempDamage;
-			_addLog("Taken " + std::to_string(tempDamage) + " damage from " + tempName);
-
-			if (_currentHealth <= 0) { // player died
-				continueGame = false;
-				_addLog("Player died!");
+		for (int i = 0; i < 3; i++) {
+			if (enemyDamageArr[i] > 0) { // enemy attacked the player
+				_currentHealth -= enemyDamageArr[i];
+				_addLog("A " + enemyNameArr[i] + " attacked. Took away " + std::to_string(enemyDamageArr[i]) + " health.");
 			}
+			else if (enemyDamageArr[i] == -1) {
+				_addLog("Defended and killed a " + enemyNameArr[i] + ".");
+			}
+		}
+
+		if (_currentHealth <= 0) { // player died
+			continueGame = false;
+			_addLog("Player died!");
 		}
 	}
 
@@ -209,7 +214,7 @@ bool Player::movePlayer(char input) {
 }
 
 void Player::printPlayerInfo() {
-	static int logLineWidth = 40;
+	static int logLineWidth = 50;
 
 	std::string infoStr = "> " + _playerLog[0] + std::string(logLineWidth - _playerLog[0].size(), ' ') + " | Health: " + std::to_string(_currentHealth) + "\n"
 		+ "> " + _playerLog[1] + std::string(logLineWidth - _playerLog[1].size(), ' ') + " | Money: " + std::to_string(_money) + "\n"
@@ -238,19 +243,20 @@ void Player::_combatEnemy(Enemy* enemy) {
     if (enemy->isALive()) {
         static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-        //int attacker = getAttacker(Enemy::RandomEngine);
-		int attacker = 2;
+        int attacker = getAttacker(Enemy::RandomEngine);
+		//int attacker = 2;
 
         switch (attacker) {
         case 1: // player attack
 			enemy->die();
 			_money += enemy->getMoney();
-			_addLog("Attacked a " + enemy->getName() + ". Got " + std::to_string(enemy->getMoney()) + " currency.");
+			_addLog("Attacked and killed a " + enemy->getName() + ". Got " + std::to_string(enemy->getMoney()) + " currency.");
             break;
 
         case 2: // enemy attack
-            _currentHealth -= enemy->getDamage();
-			_addLog("Taken " + std::to_string(enemy->getDamage()) + " damage from " + enemy->getName());
+			int damage = enemy->getDamage();
+            _currentHealth -= damage;
+			_addLog("The " + enemy->getName() + " defended and countered." + " Lost " + std::to_string(damage) + " health.");
             break;
         }
     }
