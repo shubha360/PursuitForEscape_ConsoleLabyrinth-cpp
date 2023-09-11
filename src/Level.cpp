@@ -175,11 +175,40 @@ void Level::deleteSaveGame() {
 	_outputStream.close();
 }
 
-void Level::moveEnemies(int playerX, int playerY) {
+// damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
+// enemyNameArr holds the name of the enemies
+// at most 3 enemies can attack the player
+void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], std::string enemyNameArr[]) {
+
+	// keeping count of the attacking enemies
+	int attackerCount = 0;
+
 	for (Enemy* enemy : _enemies) {
         if (enemy->isALive()) {
-            enemy->move(playerX, playerY, _levelGrid, _enemyGrid);
+			int damageHolder = 0;
+			std::string enemyNameHolder;
+
+            enemy->move(playerX, playerY, playerHealth, damageHolder, enemyNameHolder, _levelGrid, _enemyGrid);
+
+			if (damageHolder > 0) { // this enemy attacked the player
+				damageArr[attackerCount] = damageHolder;
+				enemyNameArr[attackerCount] = enemyNameHolder;
+
+				playerHealth -= damageHolder;
+				attackerCount++;
+			}
+			else if (damageHolder == -1) { // this enemy was attacked by the player
+				damageArr[attackerCount] = damageHolder;
+				enemyNameArr[attackerCount] = enemyNameHolder;
+				attackerCount++;
+			}
         }
+	}
+
+	// if less then 3 enemies attacked, fill the remaining array spots with zero
+	while (attackerCount < 3) {
+		damageArr[attackerCount] = 0;
+		attackerCount++;
 	}
 }
 
@@ -223,6 +252,10 @@ void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
 		_levelGrid[oldY][oldX] = SIGN_EMPTY;
 		_levelGrid[newY][newX] = SIGN_PLAYER;
 	}
+}
+
+void Level::erasePlayer(int playerX, int playerY) {
+	_levelGrid[playerY][playerX] = SIGN_EMPTY;
 }
 
 // open the escape gate once all artifacts are collected

@@ -10,23 +10,28 @@ class Enemy {
 public:
 	static std::mt19937 RandomEngine;
 
-	void takeDamage() { _strikesNeeded--; };
-	void move(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
+	// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
+	// if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
+	void move(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
-	int getStrikesNeeded() { return _strikesNeeded; }
-	int getDamage() { return _damage; }
+	// set an enemy to specific position
+	void set(int newX, int newY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+
+	int getDamage();
 	int getMoney() { return _moneyToGain; }
 	std::string getName() { return _name; }
 	EnemyType getType() { return _type; }
 	bool isALive() { return _alive; }
 
 	void die() { _alive = false; }
+	void setResting() { _resting = true; }
 
 protected:
 	int _posX, _posY;
 
-	int _strikesNeeded;
-	int _damage;
+	int _minDamage;
+	int _maxDamage;
 	int _moneyToGain;
 
 	std::string _name;
@@ -34,6 +39,9 @@ protected:
 	char _sign;
 
 	bool _alive;
+	bool _resting; // to determine if this enemy was in a fight in the previous move of player
+
+	std::uniform_int_distribution<int> _generateDamage;
 
 private:
 	static std::random_device _seed;
