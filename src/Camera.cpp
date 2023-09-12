@@ -102,6 +102,6 @@ void Camera::render() {
 		}
 		levelString += "\n";
 	}
-	levelString += "\n";
+	//levelString += "\n";
 	std::cout << levelString;
 }

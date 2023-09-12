@@ -186,20 +186,21 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageAr
 	for (Enemy* enemy : _enemies) {
         if (enemy->isALive()) {
 			int damageHolder = 0;
-			Enemy* enemyHolder = nullptr;
+			int xHolder;
+			int yHolder;
 
-            enemy->move(playerX, playerY, playerHealth, damageHolder, enemyHolder, _levelGrid, _enemyGrid);
+            enemy->move(playerX, playerY, playerHealth, damageHolder, xHolder, yHolder, _levelGrid, _enemyGrid);
 
 			if (damageHolder > 0) { // this enemy attacked the player
 				damageArr[attackerCount] = damageHolder;
-				enemyArr[attackerCount] = enemyHolder;
+				enemyArr[attackerCount] = _enemyGrid[yHolder][xHolder];
 
 				playerHealth -= damageHolder;
 				attackerCount++;
 			}
 			else if (damageHolder == -1) { // this enemy was attacked by the player
 				damageArr[attackerCount] = damageHolder;
-				enemyArr[attackerCount] = enemyHolder;
+				enemyArr[attackerCount] = _enemyGrid[yHolder][xHolder];
 				attackerCount++;
 			}
         }

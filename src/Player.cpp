@@ -135,28 +135,14 @@ bool Player::movePlayer(char input) {
 			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_WITCH ||
 			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_MONSTER) {
 
-            Enemy* currentEnemy = _currentLevel->getEnemyGrid()[_posY][_posX];
+			Enemy* currentEnemy = _currentLevel->getEnemyGrid()[_posY][_posX];
 
 			_combatEnemy(currentEnemy);
 
-			if (!currentEnemy->isALive()) { // enemy died
-				std::string log = "Attacked and killed a " + currentEnemy->getName() + ".";
-				log += _processEnemyKill(currentEnemy);
-				_addLog(log);
-			}
-			else { // player took damage
-				
-				// player did not move
-				_posX = _oldX;
-				_posY = _oldY;
-				
-				if (_currentHealth <= 0) { // player died
-					_currentLevel->erasePlayer(_oldX, _oldY);
-					continueGame = false;
-					_addLog("Player died!");
-				}
-				
-				currentEnemy->setResting();
+			if (_currentHealth <= 0) { // player died
+				_currentLevel->erasePlayer(_oldX, _oldY);
+				continueGame = false;
+				_addLog("Player died!");
 			}
 		}
 		else {
@@ -185,6 +171,8 @@ bool Player::movePlayer(char input) {
 			_currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
 			_camera->setCameraPosition(_posX, _posY);
 		}
+		_oldX = _posX;
+		_oldY = _posY;
 	}
 
 	// move enemies
@@ -238,15 +226,23 @@ void Player::_combatEnemy(Enemy* enemy) {
         int attacker = getAttacker(Enemy::RandomEngine);
 		//int attacker = 2;
 
+		std::string log;
+
         switch (attacker) {
         case 1: // player attack
-			enemy->die();
+			
+			log = "Attacked and killed a " + enemy->getName() + ".";
+			log += _processEnemyKill(enemy);
+			_addLog(log);
             break;
 
         case 2: // enemy attack
 			int damage = enemy->getDamage();
-            _currentHealth -= damage;
-			_addLog("The " + enemy->getName() + " defended and countered." + " Lost " + std::to_string(damage) + " health.");
+
+			std::string log = "The " + enemy->getName() + " defended and countered.";
+			log += _processAttackFromEnemy(enemy, damage);
+			
+			_addLog(log);
             break;
         }
     }
@@ -261,11 +257,16 @@ bool Player::_moveEnemies() {
 
 	for (int i = 0; i < 3; i++) {
 		if (enemyDamageArr[i] > 0) { // enemy attacked the player
-			_currentHealth -= enemyDamageArr[i];
-			_addLog("A " + enemyArr[i]->getName() + " attacked. Took away " + std::to_string(enemyDamageArr[i]) + " health.");
+
+			std::string log = "A " + enemyArr[i]->getName() + " attacked.";
+			std::string logFromEnemyAttack = _processAttackFromEnemy(enemyArr[i], enemyDamageArr[i]);
+			_addLog(log + logFromEnemyAttack);
 		}
 		else if (enemyDamageArr[i] == -1) {
-			_addLog("Defended and killed a " + enemyArr[i]->getName() + ".");
+
+			std::string log = "Defended and killed a " + enemyArr[i]->getName() + ".";
+			log += _processEnemyKill(enemyArr[i]);
+			_addLog(log);
 		}
 	}
 
@@ -276,33 +277,49 @@ bool Player::_moveEnemies() {
 }
 
 // processes attack from enemy and returns log text
-std::string Player::_processAttackFromEnemy(Enemy* enemy) {
+std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
+
+	_currentHealth -= damage;
+
+	std::string affects;
 
 	switch (enemy->getType()) {
 	case EnemyType::SNAKE:
+		affects = ".";
 		break;
 
 	case EnemyType::ZOMBIE:
+		affects = " and got 5 zombie-bitten move.";
 		break;
 	
 	case EnemyType::WITCH:
+		affects = " and took all the powerups for good.";
 		break;
 
 	case EnemyType::MONSTER:
+		affects = " and took all the artifacts.";
 		break;
 	}
 
-	return "";
+	// player did not move
+	_posX = _oldX;
+	_posY = _oldY;
+	
+	enemy->setResting();
+	
+	return " Lost " + std::to_string(damage) + " health" + affects;
 }
 
 // processes enemy kill and returns log text
 std::string Player::_processEnemyKill(Enemy* enemy) {
 
+	enemy->die();
 	_money += enemy->getMoney();
 
 	std::string affects;
 
 	switch (enemy->getType()) {
+	
 	case EnemyType::SNAKE:
 
 		_currentHealth += 5;
@@ -323,7 +340,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 		break;
 
 	case EnemyType::MONSTER:
-		affects = " and got the artifacts back.";
+		affects = " and the artifacts back.";
 		break;
 	}
 

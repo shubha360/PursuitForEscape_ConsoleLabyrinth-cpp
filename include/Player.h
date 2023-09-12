@@ -34,7 +34,7 @@ private:
 
 	void _combatEnemy(Enemy* enemy);
 	bool _moveEnemies(); // moves enemies after player moves, returns false if player died from an enemy attack
-	std::string _processAttackFromEnemy(Enemy* enemy); // processes attack from enemy and returns log text
+	std::string _processAttackFromEnemy(Enemy* enemy, int damage); // processes attack from enemy and returns log text
 	std::string _processEnemyKill(Enemy* enemy); // processes enemy kill and returns log text
 
 	void _addLog(std::string logText);
