@@ -11,7 +11,7 @@ public:
 	Player();
 	Player(Level* level, Camera* camera);
 	bool movePlayer(char input);
-	void printPlayerInfo();
+	std::string getPlayerInfo();
 	void updatePlayerAfterGameStateChange();
 
 	int getPositionX() { return _posX; };

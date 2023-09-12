@@ -9,7 +9,7 @@ GameManager::GameManager(std::string levelFileLocation) {
 void GameManager::playGame() {
 
 	while (_state != GameStates::EXIT) {
-		
+
 		switch (_state) {
 
 		case GameStates::MAIN_MENU:
@@ -70,11 +70,10 @@ void GameManager::playGame() {
 
 		case GameStates::PLAY_GAME:
 
-			_camera.render();
-			_player.printPlayerInfo();
+			_camera.render(_player.getPlayerInfo());
 
 			do {
-				char input = _getch();				
+				char input = _getch();
 
 				// returns false if player died or the level is completed
 				if (!_player.movePlayer(input)) {
@@ -112,39 +111,46 @@ void GameManager::_printIntro() {
 }
 
 void GameManager::_printMainMenu() {
-	static const std::string menu = "1. New Game\n2. Load Game\n3. How to play\n4. Exit Game\n\nYour input: ";
+	static const std::string menu = "1. New Game\n2. Load Game\n3. How to play (Important if you are first timer)\n4. Exit Game\n\nYour input: ";
 	std::cout << menu;
 }
 
 void GameManager::_printHowToPlay() {
-	
+
 	std::cout << std::string(40, '\n');
 	_printIntro();
 
-	std::string htp =
-		"The main purpose of the player is to escape the labyrinth through the escape gate. " 
-		"But the escape gate remains locked until all the artifacts are collected. " 
-		"Also there are some ferocious enemies waiting to make a feast of the player! " 
+	static std::string htp =
+        "Some system instructions -\n"
+        "Set the CMD or the thing you're running this game on to full screen to have the proper view.\n"
+        "If it is not possible set full screen by default, there should be some way around. You just have to google it.\n"
+        "For example, on Windows 7 you can set the CMD to full screen by changing the layout measurements "
+        "right clicking on the title bar -> properties -> layout\n"
+        "You may experience clumsy frame loading if you're running it on a system that's too old.\n"
+		"\n\n\n"
+		"The main purpose of the player is to escape the labyrinth through the escape gate. "
+		"But the escape gate remains locked until all the artifacts are collected. "
+		"Also there are some ferocious enemies waiting to make a feast of the player! "
 		"Player has to find all the artifacts killing or avoiding the enemies.\n\n"
 		"Player and an enemy fight each other if they are in the same spot in the labyrinth or player moves to the adjacent spot to enemy. "
 		"Because, enemy makes it's move after player. "
 		"So if player is in the adjacent spot of enemy, enemy makes it's move towards the player's spot and fights player. "
-		"It will be randomly determined who will attack whom. " 
+		"It will be randomly determined who will attack whom. "
 		"Any enemy will be killed with a single attack. "
 		"Max health of player is 100 and game ends if the player dies from attack of an enemy.\n\n"
-		"There are various powerups available to collect or to buy from the shop. "
-		"Money is used to buy powerups. Money can be found around the labyrinth and by killing enemies. "
+		"There are various power ups available to collect or to buy from the shop. "
+		"Money is used to buy power ups. Money can be found around the labyrinth and by killing enemies. \n"
 		"\n\n\n"
 		"There are 4 different type of enemies. Each has it's own characteristics and powers.\n\n"
-		
-		"Snake - The weakest one. Can deal 15 - 20 health damage to the player. " 
+
+		"Snake - The weakest one. Can deal 15 - 20 health damage to the player. "
 		"Can be eaten after killing for gaining 5 health back. "
 		"Player earns 20 currency for killing a snake.\n\n"
-		
+
 		"Zombie - Can deal 10 - 15 health damage to the player at once and then 2 - 4 health damage for each next 5 moves. "
 		"Total 35 damage at the worst case. "
 		"Player earns 50 currency for killing a zombie.\n\n"
-		
+
 		"Witch - Can deal 40 - 50 health damage to the player and take away all the powerups for good. "
 		"Player earns 120 currency for killing a witch.\n\n"
 

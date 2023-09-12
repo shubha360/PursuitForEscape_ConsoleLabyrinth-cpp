@@ -183,13 +183,12 @@ bool Player::movePlayer(char input) {
 		}
 	}
 
-	_camera->render();
-	printPlayerInfo();
+	_camera->render(getPlayerInfo());
 
 	return continueGame;
 }
 
-void Player::printPlayerInfo() {
+std::string Player::getPlayerInfo() {
 	static int plInfoWidth = 30;
 
 	std::string healthStr = " Health: " + std::to_string(_currentHealth);
@@ -201,7 +200,7 @@ void Player::printPlayerInfo() {
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
 		+ std::string(plInfoWidth, ' ') + "|> " + _playerLog[3] + "\n";
 
-	std::cout << infoStr;
+	return infoStr;
 }
 
 void Player::updatePlayerAfterGameStateChange() {
@@ -215,8 +214,7 @@ void Player::updatePlayerAfterGameStateChange() {
 	_currentLevel->setPlayer(_posX, _posY);
 	_camera->setCameraPosition(_posX, _posY);
 
-	_camera->render();
-	printPlayerInfo();
+	_camera->render(getPlayerInfo());
 }
 
 void Player::_combatEnemy(Enemy* enemy) {
@@ -230,7 +228,7 @@ void Player::_combatEnemy(Enemy* enemy) {
 
         switch (attacker) {
         case 1: // player attack
-			
+
 			log = "Attacked and killed a " + enemy->getName() + ".";
 			log += _processEnemyKill(enemy);
 			_addLog(log);
@@ -241,7 +239,7 @@ void Player::_combatEnemy(Enemy* enemy) {
 
 			std::string log = "The " + enemy->getName() + " defended and countered.";
 			log += _processAttackFromEnemy(enemy, damage);
-			
+
 			_addLog(log);
             break;
         }
@@ -291,9 +289,9 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
 	case EnemyType::ZOMBIE:
 		affects = " and got 5 zombie-bitten move.";
 		break;
-	
+
 	case EnemyType::WITCH:
-		affects = " and took all the powerups for good.";
+		affects = " and took all the power ups for good.";
 		break;
 
 	case EnemyType::MONSTER:
@@ -304,9 +302,9 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
 	// player did not move
 	_posX = _oldX;
 	_posY = _oldY;
-	
+
 	enemy->setResting();
-	
+
 	return " Lost " + std::to_string(damage) + " health" + affects;
 }
 
@@ -319,7 +317,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 	std::string affects;
 
 	switch (enemy->getType()) {
-	
+
 	case EnemyType::SNAKE:
 
 		_currentHealth += 5;

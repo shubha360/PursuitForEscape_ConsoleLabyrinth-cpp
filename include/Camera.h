@@ -10,7 +10,7 @@ public:
 	Camera();
 	Camera(Level* level);
 	void setCameraPosition(int x, int y); // center the camera according to player's xy coordinate
-	void render(); // render the view inside camera
+	void render(std::string playerInfo); // render the view inside camera
 
 private:
 	int _posX, _posY;

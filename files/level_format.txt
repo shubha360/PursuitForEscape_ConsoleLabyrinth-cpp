@@ -1,0 +1,48 @@
+LEVEL NAME
+
+NUMBER OF ROWS
+NUMBER OF COLLUMNS
+
+PLAYER HEALTH
+PLAYER MONEY
+ARTIFACTS COLLECTED BY PLAYER
+
+NUMBER OF ARTIFACTS IN THIS LEVEL
+
+LEVEL GRID STARTS HERE
+
+
+The level file should be formatted exactly according to above format. Proper game experience may not be achieved otherwise.
+
+@ - Player
+# - Wall
+= - Escape Gate Wall
+X - Escape Gate Locked
+~ - Escape Gate Unlocked
+! - Artifact
+S - Snake
+Z - Zombie
+W - Witch
+M - Monster
+
+An example level -
+
+Example level
+
+8
+10
+
+100
+100
+0
+
+1
+
+###########
+#      !  #
+# @       #
+#     W   #
+#        ==
+#         X
+#        ==
+###########
