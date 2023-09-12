@@ -160,7 +160,7 @@ bool Player::movePlayer(char input) {
             // collected an artifact
             if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
                 _artifactsCollected++;
-				_addLog("Artifact collected");
+				_addLog("Artifact collected. Artifacts remaining: " + std::to_string(_currentLevel->getNumberOfArtifacts() - _artifactsCollected));
 
                 // open escape gate if all artifacts are collected
                 if (_artifactsCollected == _currentLevel->getNumberOfArtifacts()) {
@@ -214,12 +214,16 @@ bool Player::movePlayer(char input) {
 }
 
 void Player::printPlayerInfo() {
-	static int logLineWidth = 50;
+	static int plInfoWidth = 30;
 
-	std::string infoStr = "> " + _playerLog[0] + std::string(logLineWidth - _playerLog[0].size(), ' ') + " | Health: " + std::to_string(_currentHealth) + "\n"
-		+ "> " + _playerLog[1] + std::string(logLineWidth - _playerLog[1].size(), ' ') + " | Money: " + std::to_string(_money) + "\n"
-		+ "> " + _playerLog[2] + std::string(logLineWidth - _playerLog[2].size(), ' ') + " | Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts()) + "\n"
-		+ "> " + _playerLog[3] + std::string(logLineWidth - _playerLog[3].size(), ' ') + " |\n";
+	std::string healthStr = " Health: " + std::to_string(_currentHealth);
+	std::string moneyStr = " Money: " + std::to_string(_money);
+	std::string artifactsStr = " Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts());
+
+	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
+		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
+		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
+		+ std::string(plInfoWidth, ' ') + "|> " + _playerLog[3] + "\n";
 
 	std::cout << infoStr;
 }
