@@ -9,6 +9,8 @@ Player::Player() {
 
 	_posX = -1;
 	_posY = -1;
+	_oldX = -1;
+	_oldY = -1;
 
 	_currentHealth = -1;
 	_money = -1;
@@ -21,6 +23,8 @@ Player::Player(Level* level, Camera* camera) {
 
 	_posX = _currentLevel->getPlayerX();
 	_posY = _currentLevel->getPlayerY();
+	_oldX = _currentLevel->getPlayerX();
+	_oldY = _currentLevel->getPlayerY();
 
 	_currentHealth = _currentLevel->getPlayerHealth();
 	_money = _currentLevel->getPlayerMoney();
@@ -39,8 +43,6 @@ bool Player::movePlayer(char input) {
 	bool moveEnemies = false;
 
 	// store the old player coordinates before moving
-	int oldX = _posX;
-	int oldY = _posY;
 
 	switch (input) {
 	case 'w': // move up
@@ -98,8 +100,8 @@ bool Player::movePlayer(char input) {
 			updatePlayerAfterGameStateChange();
 
 			// prevent triggering player moving functionality
-			oldX = _posX;
-			oldY = _posY;
+			_oldX = _posX;
+			_oldY = _posY;
 			_addLog("Game loaded");
 		}
 		break;
@@ -109,8 +111,8 @@ bool Player::movePlayer(char input) {
 		updatePlayerAfterGameStateChange();
 
 		// prevent triggering player moving functionality
-		oldX = _posX;
-		oldY = _posY;
+		_oldX = _posX;
+		_oldY = _posY;
 		_addLog("Started new game");
 		break;
 
@@ -126,7 +128,7 @@ bool Player::movePlayer(char input) {
 	}
 
 	// different old and new coordinates mean player moved
-	if (_posX != oldX || _posY != oldY) {
+	if (_posX != _oldX || _posY != _oldY) {
 
 		if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SNAKE ||
 			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ZOMBIE ||
@@ -138,17 +140,18 @@ bool Player::movePlayer(char input) {
 			_combatEnemy(currentEnemy);
 
 			if (!currentEnemy->isALive()) { // enemy died
-				_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
-				_camera->setCameraPosition(_posX, _posY);
+				std::string log = "Attacked and killed a " + currentEnemy->getName() + ".";
+				log += _processEnemyKill(currentEnemy);
+				_addLog(log);
 			}
 			else { // player took damage
 				
 				// player did not move
-				_posX = oldX;
-				_posY = oldY;
+				_posX = _oldX;
+				_posY = _oldY;
 				
 				if (_currentHealth <= 0) { // player died
-					_currentLevel->erasePlayer(oldX, oldY);
+					_currentLevel->erasePlayer(_oldX, _oldY);
 					continueGame = false;
 					_addLog("Player died!");
 				}
@@ -169,7 +172,7 @@ bool Player::movePlayer(char input) {
 					_addLog("Escape gate opened");
                 }
 
-                _currentLevel->setPlayer(_posX, _posY, oldX, oldY);
+                _currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
                 _camera->setCameraPosition(_posX, _posY);
             }
 
@@ -179,29 +182,14 @@ bool Player::movePlayer(char input) {
 				_addLog("Escaped!");
             }
 
-			_currentLevel->setPlayer(_posX, _posY, oldX, oldY);
+			_currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
 			_camera->setCameraPosition(_posX, _posY);
 		}
 	}
 
 	// move enemies
 	if (moveEnemies) {
-		int enemyDamageArr[3]; // for getting damage dealt by a moving enemy
-		std::string enemyNameArr[3]; // for getting the name of the enemy
-
-		_currentLevel->moveEnemies(_posX, _posY, _currentHealth, enemyDamageArr, enemyNameArr);
-
-		for (int i = 0; i < 3; i++) {
-			if (enemyDamageArr[i] > 0) { // enemy attacked the player
-				_currentHealth -= enemyDamageArr[i];
-				_addLog("A " + enemyNameArr[i] + " attacked. Took away " + std::to_string(enemyDamageArr[i]) + " health.");
-			}
-			else if (enemyDamageArr[i] == -1) {
-				_addLog("Defended and killed a " + enemyNameArr[i] + ".");
-			}
-		}
-
-		if (_currentHealth <= 0) { // player died
+		if (!_moveEnemies()) { // false means player died
 			continueGame = false;
 			_addLog("Player died!");
 		}
@@ -253,8 +241,6 @@ void Player::_combatEnemy(Enemy* enemy) {
         switch (attacker) {
         case 1: // player attack
 			enemy->die();
-			_money += enemy->getMoney();
-			_addLog("Attacked and killed a " + enemy->getName() + ". Got " + std::to_string(enemy->getMoney()) + " currency.");
             break;
 
         case 2: // enemy attack
@@ -266,28 +252,86 @@ void Player::_combatEnemy(Enemy* enemy) {
     }
 }
 
-//std::string Player::_processAttackFromEnemy(Enemy* enemy) {
-//	std::string enemyName;
-//
-//	switch (enemy->getType()) {
-//	case EnemyType::SNAKE:
-//		enemyName = "snake";
-//		break;
-//
-//	case EnemyType::ZOMBIE:
-//		enemyName = "zombie";
-//		break;
-//	
-//	case EnemyType::WITCH:
-//		enemyName = "witch";
-//		break;
-//
-//	case EnemyType::MONSTER:
-//		enemyName = "monster";
-//		break;
-//	}
-//	return enemyName;
-//}
+// moves enemies after player moves, returns false if player died from an enemy attack
+bool Player::_moveEnemies() {
+	int enemyDamageArr[3]; // for getting damage dealt by a moving enemy
+	Enemy* enemyArr[3] { nullptr,nullptr,nullptr }; // for getting the name of the enemy
+
+	_currentLevel->moveEnemies(_posX, _posY, _currentHealth, enemyDamageArr, enemyArr);
+
+	for (int i = 0; i < 3; i++) {
+		if (enemyDamageArr[i] > 0) { // enemy attacked the player
+			_currentHealth -= enemyDamageArr[i];
+			_addLog("A " + enemyArr[i]->getName() + " attacked. Took away " + std::to_string(enemyDamageArr[i]) + " health.");
+		}
+		else if (enemyDamageArr[i] == -1) {
+			_addLog("Defended and killed a " + enemyArr[i]->getName() + ".");
+		}
+	}
+
+	if (_currentHealth <= 0) { // player died
+		return false;
+	}
+	return true;
+}
+
+// processes attack from enemy and returns log text
+std::string Player::_processAttackFromEnemy(Enemy* enemy) {
+
+	switch (enemy->getType()) {
+	case EnemyType::SNAKE:
+		break;
+
+	case EnemyType::ZOMBIE:
+		break;
+	
+	case EnemyType::WITCH:
+		break;
+
+	case EnemyType::MONSTER:
+		break;
+	}
+
+	return "";
+}
+
+// processes enemy kill and returns log text
+std::string Player::_processEnemyKill(Enemy* enemy) {
+
+	_money += enemy->getMoney();
+
+	std::string affects;
+
+	switch (enemy->getType()) {
+	case EnemyType::SNAKE:
+
+		_currentHealth += 5;
+
+		if (_currentHealth > 100) {
+			_currentHealth = 100;
+		}
+
+		affects = " and 5 health.";
+		break;
+
+	case EnemyType::ZOMBIE:
+		affects = ".";
+		break;
+
+	case EnemyType::WITCH:
+		affects = ".";
+		break;
+
+	case EnemyType::MONSTER:
+		affects = " and got the artifacts back.";
+		break;
+	}
+
+	_currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
+	_camera->setCameraPosition(_posX, _posY);
+
+	return " Got " + std::to_string(enemy->getMoney()) + " currency" + affects;
+}
 
 void Player::_addLog(std::string logText) {
 	for (int i = 2; i >= 0; i--) {

@@ -13,7 +13,7 @@ public:
 	// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
 	// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
 	// if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
-	void move(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	void move(int playerX, int playerY, int playerHealth, int& damageHolder, Enemy* enemyHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
 	// set an enemy to specific position
 	void set(int newX, int newY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);

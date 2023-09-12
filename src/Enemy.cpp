@@ -10,7 +10,7 @@ int Enemy::getDamage() {
 // damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
 // enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
 // if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
-void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, std::string& enemyNameHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, Enemy* enemyHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	
 	// attack if player is in a spot adjacent to this enemy
 	if ((playerX == _posX - 1 && playerY == _posY) ||
@@ -32,7 +32,7 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 				switch (attacker) {
 				case 1: // enemy attack
 					damageHolder = _generateDamage(RandomEngine);
-					enemyNameHolder = this->getName();
+					enemyHolder = this;
 
 					if (playerHealth - damageHolder <= 0) { // if player died, set this enemy's position to player's position
 						levelGrid[playerY][playerX] = _sign;
@@ -48,7 +48,7 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 
 				case 2: // player attack
 					damageHolder = -1;
-					enemyNameHolder = this->getName();
+					enemyHolder = this;
 
 					levelGrid[_posY][_posX] = ' ';
 					this->die();

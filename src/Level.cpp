@@ -178,7 +178,7 @@ void Level::deleteSaveGame() {
 // damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
 // enemyNameArr holds the name of the enemies
 // at most 3 enemies can attack the player
-void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], std::string enemyNameArr[]) {
+void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], Enemy* enemyArr[]) {
 
 	// keeping count of the attacking enemies
 	int attackerCount = 0;
@@ -186,20 +186,20 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageAr
 	for (Enemy* enemy : _enemies) {
         if (enemy->isALive()) {
 			int damageHolder = 0;
-			std::string enemyNameHolder;
+			Enemy* enemyHolder = nullptr;
 
-            enemy->move(playerX, playerY, playerHealth, damageHolder, enemyNameHolder, _levelGrid, _enemyGrid);
+            enemy->move(playerX, playerY, playerHealth, damageHolder, enemyHolder, _levelGrid, _enemyGrid);
 
 			if (damageHolder > 0) { // this enemy attacked the player
 				damageArr[attackerCount] = damageHolder;
-				enemyNameArr[attackerCount] = enemyNameHolder;
+				enemyArr[attackerCount] = enemyHolder;
 
 				playerHealth -= damageHolder;
 				attackerCount++;
 			}
 			else if (damageHolder == -1) { // this enemy was attacked by the player
 				damageArr[attackerCount] = damageHolder;
-				enemyNameArr[attackerCount] = enemyNameHolder;
+				enemyArr[attackerCount] = enemyHolder;
 				attackerCount++;
 			}
         }
@@ -244,12 +244,12 @@ void Level::setPlayer(int newX, int newY) {
 }
 
 // set player at new xy coordinate and reset old xy coordinate
-void Level::setPlayer(int newX, int newY, int oldX, int oldY) {
+void Level::setPlayer(int newX, int newY, int _oldX, int _oldY) {
 	if (!_levelLoaded) {
 		std::cout << "Level not loaded!\n";
 	}
 	else {
-		_levelGrid[oldY][oldX] = SIGN_EMPTY;
+		_levelGrid[_oldY][_oldX] = SIGN_EMPTY;
 		_levelGrid[newY][newX] = SIGN_PLAYER;
 	}
 }

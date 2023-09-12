@@ -30,14 +30,14 @@ public:
 	void deleteSaveGame();
 	char getTileAtGrid(int x, int y); // get the character at xy coordinate
 	void setPlayer(int newX, int newY); // set player at xy coordinate
-	void setPlayer(int newX, int newY, int oldX, int oldY); // set player at new xy coordinate and reset old xy coordinate
+	void setPlayer(int newX, int newY, int _oldX, int _oldY); // set player at new xy coordinate and reset old xy coordinate
 	void erasePlayer(int playerX, int playerY); // erase player from grid
 	void openEscapeGate(); // open the escape gate when all artifacts are collected
 
 	// damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
 	// enemyNameArr holds the name of the enemies
 	// at most 3 enemies can attack the player
-	void moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], std::string enemyNameArr[]);
+	void moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], Enemy* enemyArr[]);
 
 	void printLevel(); // print whole level at once
 

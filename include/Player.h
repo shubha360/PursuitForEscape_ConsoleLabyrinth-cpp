@@ -22,6 +22,7 @@ public:
 
 private:
 	int _posX, _posY;
+	int _oldX, _oldY; // for storing coordinates of previous spot after a move
 	Level* _currentLevel;
 	Camera* _camera;
 
@@ -32,7 +33,9 @@ private:
 	std::string _playerLog[4] {"", "", "", ""};
 
 	void _combatEnemy(Enemy* enemy);
-	//std::string _processAttackFromEnemy(Enemy* enemy);
+	bool _moveEnemies(); // moves enemies after player moves, returns false if player died from an enemy attack
+	std::string _processAttackFromEnemy(Enemy* enemy); // processes attack from enemy and returns log text
+	std::string _processEnemyKill(Enemy* enemy); // processes enemy kill and returns log text
 
 	void _addLog(std::string logText);
 };
