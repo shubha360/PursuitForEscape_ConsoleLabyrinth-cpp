@@ -11,13 +11,13 @@ int Enemy::getDamage() {
 // enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
 // if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
 void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, int& enemyXHolder, int& enemyYHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-	
+
 	// attack if player is in a spot adjacent to this enemy
 	if ((playerX == _posX - 1 && playerY == _posY) ||
 		(playerX == _posX + 1 && playerY == _posY) ||
 		(playerX == _posX && playerY == _posY - 1) ||
 		(playerX == _posX && playerY == _posY + 1)) {
-		
+
 		if (_resting) { // don't attack if this enemy was in fight with player in the previous move from player
 			_resting = false;
 		}
@@ -26,8 +26,8 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 
 				static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-				int attacker = getAttacker(RandomEngine);
-				//int attacker = 2;
+				//int attacker = getAttacker(RandomEngine);
+				int attacker = 1;
 
 				switch (attacker) {
 				case 1: // enemy attack

@@ -15,6 +15,7 @@ Player::Player() {
 	_currentHealth = -1;
 	_money = -1;
 	_artifactsCollected = -1;
+    _shields = -1;
 
 	_zombieInfectedMoves = 0;
 	_zombieAttackedNow = false;
@@ -24,20 +25,7 @@ Player::Player(Level* level, Camera* camera) {
 	_currentLevel = level;
 	_camera = camera;
 
-	_posX = _currentLevel->getPlayerX();
-	_posY = _currentLevel->getPlayerY();
-	_oldX = _currentLevel->getPlayerX();
-	_oldY = _currentLevel->getPlayerY();
-
-	_currentHealth = _currentLevel->getPlayerHealth();
-	_money = _currentLevel->getPlayerMoney();
-	_artifactsCollected = _currentLevel->getArtifactsCollected();
-
-	_zombieInfectedMoves = 0;
-	_zombieAttackedNow = false;
-
-	_currentLevel->setPlayer(_posX, _posY);
-	_camera->setCameraPosition(_posX, _posY);
+    updatePlayerAfterGameStateChange();
 }
 
 bool Player::movePlayer(char input) {
@@ -93,7 +81,7 @@ bool Player::movePlayer(char input) {
 
 	case 'j': // save game
 
-		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
+		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected, _zombieInfectedMoves, _shields);
 		_addLog("Game saved");
 		break;
 
@@ -187,6 +175,12 @@ bool Player::movePlayer(char input) {
 				_addLog("Found health refill.");
 			}
 
+			// found a shield
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SHIELD) {
+				_shields++;
+				_addLog("Found a shield. Total shields " + std::to_string(_shields) + ".");
+			}
+
 			// game is ended if player accessed the escape gate
 			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
                 continueGame = false;
@@ -200,12 +194,11 @@ bool Player::movePlayer(char input) {
 		_oldY = _posY;
 	}
 
-	// player triggered a movement
-	if (playerTriedToMove) {
+	// player triggered a movement and if player did not die
+	if (playerTriedToMove && continueGame) {
 
 		// health damage due to zombie infection
-		
-		if (_zombieInfectedMoves > 0) { 
+		if (_zombieInfectedMoves > 0) {
 
 			// do not perform a zombie infected move if zombie attacked in the previous move
 			if (_zombieAttackedNow) {
@@ -218,7 +211,7 @@ bool Player::movePlayer(char input) {
 				_currentHealth -= damage;
 				_zombieInfectedMoves--;
 
-				_addLog("Lost " + std::to_string(damage) + " health due to zombie infection." 
+				_addLog("Lost " + std::to_string(damage) + " health due to zombie infection."
 					+ std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
 
 				if (_currentHealth <= 0) { // player died
@@ -226,13 +219,15 @@ bool Player::movePlayer(char input) {
 					_currentLevel->erasePlayer(_posX, _posY);
 					_addLog("Player died!");
 				}
-			}			
+			}
 		}
 
-		// move enemies
-		if (!_moveEnemies()) { // false means player died
-			continueGame = false;
-			_addLog("Player died!");
+		// move enemies if player did not die
+		if (continueGame) {
+            if (!_moveEnemies()) { // false means player died
+                continueGame = false;
+                _addLog("Player died!");
+            }
 		}
 	}
 
@@ -247,35 +242,42 @@ std::string Player::getPlayerInfo() {
 	std::string healthStr = " Health: " + std::to_string(_currentHealth);
 	std::string moneyStr = " Money: " + std::to_string(_money);
 	std::string artifactsStr = " Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts());
+    std::string zombieInfText = " Zombie-infected Moves: " + std::to_string(_zombieInfectedMoves);
+    std::string shieldsText = " Shields: " + std::to_string(_shields);
 
 	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
 		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
-		+ std::string(plInfoWidth, ' ') + "|> " + _playerLog[3] + "\n";
+		+ zombieInfText + std::string(plInfoWidth - zombieInfText.size(), ' ') + "|> " + _playerLog[3] + "\n"
+		+ shieldsText + std::string(plInfoWidth - shieldsText.size(), ' ') + "|> " + _playerLog[4] + "\n";
 
 	return infoStr;
 }
 
 void Player::updatePlayerAfterGameStateChange() {
-	_posX = _currentLevel->getPlayerX();
+    _posX = _currentLevel->getPlayerX();
 	_posY = _currentLevel->getPlayerY();
+	_oldX = _currentLevel->getPlayerX();
+	_oldY = _currentLevel->getPlayerY();
 
 	_currentHealth = _currentLevel->getPlayerHealth();
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
 
+	_zombieInfectedMoves = _currentLevel->getZombieInfectedMoves();
+	_zombieAttackedNow = false;
+	_shields = _currentLevel->getShields();
+
 	_currentLevel->setPlayer(_posX, _posY);
 	_camera->setCameraPosition(_posX, _posY);
-
-	_camera->render(getPlayerInfo());
 }
 
 void Player::_combatEnemy(Enemy* enemy) {
     if (enemy->isALive()) {
         static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-        int attacker = getAttacker(Enemy::RandomEngine);
-		//int attacker = 2;
+        //int attacker = getAttacker(Enemy::RandomEngine);
+		int attacker = 2;
 
 		std::string log;
 
@@ -293,6 +295,9 @@ void Player::_combatEnemy(Enemy* enemy) {
 			std::string log = "The " + enemy->getName() + " defended and countered.";
 			log += _processAttackFromEnemy(enemy, damage);
 
+            // only set resting if an enemy defended and countered, otherwise enemy will attack immediately after countering
+            enemy->setResting();
+
 			_addLog(log);
             break;
         }
@@ -304,7 +309,7 @@ bool Player::_moveEnemies() {
 	int enemyDamageArr[3]; // for getting damage dealt by a moving enemy
 	Enemy* enemyArr[3] { nullptr,nullptr,nullptr }; // for getting the name of the enemy
 
-	_currentLevel->moveEnemies(_posX, _posY, _currentHealth, enemyDamageArr, enemyArr);
+	_currentLevel->moveEnemies(_posX, _posY, _currentHealth, _shields, enemyDamageArr, enemyArr);
 
 	for (int i = 0; i < 3; i++) {
 		if (enemyDamageArr[i] > 0) { // enemy attacked the player
@@ -329,38 +334,44 @@ bool Player::_moveEnemies() {
 
 // processes attack from enemy and returns log text
 std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
+    std::string output = "";
 
-	_currentHealth -= damage;
+    if (_shields > 0) {
+        _shields--;
+        output = " Blocked using a shield. Shields remaining: " + std::to_string(_shields) + ".";
+    }
+    else {
+        _currentHealth -= damage;
 
-	std::string affects;
+        std::string affects;
 
-	switch (enemy->getType()) {
-	case EnemyType::SNAKE:
-		affects = ".";
-		break;
+        switch (enemy->getType()) {
+        case EnemyType::SNAKE:
+            affects = ".";
+            break;
 
-	case EnemyType::ZOMBIE:
-		_zombieInfectedMoves = 5;
-		_zombieAttackedNow = true;
-		affects = " and got 5 zombie-infected moves.";
-		break;
+        case EnemyType::ZOMBIE:
+            _zombieInfectedMoves = 5;
+            _zombieAttackedNow = true;
+            affects = " and got 5 zombie-infected moves.";
+            break;
 
-	case EnemyType::WITCH:
-		affects = " and took all the power ups for good.";
-		break;
+        case EnemyType::WITCH:
+            affects = " and took all the power ups for good.";
+            break;
 
-	case EnemyType::MONSTER:
-		affects = " and took all the artifacts.";
-		break;
-	}
+        case EnemyType::MONSTER:
+            affects = " and took all the artifacts.";
+            break;
+        }
+        output = " Lost " + std::to_string(damage) + " health" + affects;
+    }
 
-	// player did not move
-	_posX = _oldX;
-	_posY = _oldY;
+    // player did not move
+    _posX = _oldX;
+    _posY = _oldY;
 
-	enemy->setResting();
-
-	return " Lost " + std::to_string(damage) + " health" + affects;
+	return output;
 }
 
 // processes enemy kill and returns log text
@@ -398,7 +409,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 }
 
 void Player::_addLog(std::string logText) {
-	for (int i = 2; i >= 0; i--) {
+	for (int i = 3; i >= 0; i--) {
 		_playerLog[i + 1] = _playerLog[i];
 	}
 	_playerLog[0] = logText;

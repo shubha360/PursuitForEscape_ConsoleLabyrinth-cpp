@@ -14,6 +14,7 @@ const char Level::SIGN_MONSTER = 'M';
 const char Level::SIGN_RANDOM_MONEY = '$';
 const char Level::SIGN_10_HEALTH = '+';
 const char Level::SIGN_REFILL_HEALTH = '*';
+const char Level::SIGN_SHIELD = '^';
 
 const std::string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
 const std::string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
@@ -78,6 +79,10 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
+    _inputStream >> _numberOfArtifacts;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
+
 	_inputStream >> _playerHealth;
 	getline(_inputStream, line);
 
@@ -88,7 +93,9 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
-	_inputStream >> _numberOfArtifacts;
+	_inputStream >> _zombieInfMovesLeft;
+	getline(_inputStream, line);
+	_inputStream >> _shieldsLeft;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
@@ -145,7 +152,10 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	return true;
 }
 
-void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
+void Level::saveLevel(int playerPosX, int playerPosY,
+                      int playerHealth, int playerMoney, int playerArtifacts,
+                      int zombieInfectedMoves, int shields) {
+
 	_outputStream.open(SAVE_FILE_LOCATION);
 
 	if (_outputStream.fail()) {
@@ -153,8 +163,9 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 	}
 
 	std::string output = _levelName + "\n\n" + std::to_string(_rows) + "\n" + std::to_string(_columns) + "\n\n"
+        + std::to_string(_numberOfArtifacts) + "\n\n"
 		+ std::to_string(playerHealth) + "\n" + std::to_string(playerMoney) + "\n" + std::to_string(playerArtifacts) + "\n\n"
-		+ std::to_string(_numberOfArtifacts) + "\n\n";
+		+ std::to_string(zombieInfectedMoves) + "\n" + std::to_string(shields) + "\n\n";
 
 	for (int i = 0; i < _rows; i++) {
 		output += _levelGrid[i];
@@ -181,7 +192,7 @@ void Level::deleteSaveGame() {
 // damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
 // enemyNameArr holds the name of the enemies
 // at most 3 enemies can attack the player
-void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], Enemy* enemyArr[]) {
+void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]) {
 
 	// keeping count of the attacking enemies
 	int attackerCount = 0;
@@ -198,7 +209,12 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageAr
 				damageArr[attackerCount] = damageHolder;
 				enemyArr[attackerCount] = _enemyGrid[yHolder][xHolder];
 
-				playerHealth -= damageHolder;
+                if (playerShields > 0) {
+                    playerShields--;
+                }
+                else {
+                    playerHealth -= damageHolder;
+                }
 				attackerCount++;
 			}
 			else if (damageHolder == -1) { // this enemy was attacked by the player

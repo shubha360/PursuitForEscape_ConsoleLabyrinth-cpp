@@ -21,6 +21,7 @@ public:
 	static const char SIGN_RANDOM_MONEY;
 	static const char SIGN_10_HEALTH;
 	static const char SIGN_REFILL_HEALTH;
+	static const char SIGN_SHIELD;
 
 	static const std::string SAVE_FILE_LOCATION;
 	static const std::string SAVE_FILE_DEFAULT_TEXT;
@@ -29,7 +30,8 @@ public:
 	~Level();
 	void addLevelFile(std::string levelFileLocation);
 	bool loadLevel(std::string currentFileLocation);
-	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts);
+	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts,
+                int zombieInfectedMoves, int shields);
 	void deleteSaveGame();
 	char getTileAtGrid(int x, int y); // get the character at xy coordinate
 	void setPlayer(int newX, int newY); // set player at xy coordinate
@@ -40,7 +42,7 @@ public:
 	// damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
 	// enemyNameArr holds the name of the enemies
 	// at most 3 enemies can attack the player
-	void moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], Enemy* enemyArr[]);
+	void moveEnemies(int playerX, int playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]);
 
 	void printLevel(); // print whole level at once
 
@@ -51,12 +53,14 @@ public:
 	int getNumberOfArtifacts(){ return _numberOfArtifacts; }
 	int getEscapeX() { return _escapeX; }
 	int getEscapeY() { return _escapeY; }
-	
+
 	int getPlayerX() { return _playerX; }
 	int getPlayerY() { return _playerY; }
 	int getPlayerHealth() { return _playerHealth; }
 	int getPlayerMoney() { return _playerMoney; }
 	int getArtifactsCollected() { return _artifactsCollected; }
+	int getZombieInfectedMoves() { return _zombieInfMovesLeft; }
+	int getShields() { return _shieldsLeft; }
 
 	std::vector<std::string>& getLevelGrid() { return _levelGrid; }
 	std::vector<std::vector<Enemy*>>& getEnemyGrid() { return _enemyGrid; }
@@ -75,6 +79,7 @@ private:
 	int _rows, _columns;
 	int _playerX, _playerY;
 	int _playerHealth, _playerMoney, _artifactsCollected;
+	int _zombieInfMovesLeft, _shieldsLeft;
 	int _numberOfArtifacts;
 	bool _levelLoaded;
 	int _escapeX, _escapeY;
