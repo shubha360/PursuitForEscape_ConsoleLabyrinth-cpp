@@ -15,6 +15,7 @@ Player::Player() {
 	_currentHealth = -1;
 	_money = -1;
 	_artifactsCollected = -1;
+    _shields = -1;
 
 	_zombieInfectedMoves = 0;
 	_zombieAttackedNow = false;
@@ -33,8 +34,9 @@ Player::Player(Level* level, Camera* camera) {
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
 
-	_zombieInfectedMoves = 0;
+	_zombieInfectedMoves = _currentLevel->getZombieInfectedMoves();
 	_zombieAttackedNow = false;
+	_shields = _currentLevel->getShields();
 
 	_currentLevel->setPlayer(_posX, _posY);
 	_camera->setCameraPosition(_posX, _posY);
@@ -93,7 +95,7 @@ bool Player::movePlayer(char input) {
 
 	case 'j': // save game
 
-		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected);
+		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected, _zombieInfectedMoves, _shields);
 		_addLog("Game saved");
 		break;
 
@@ -204,8 +206,8 @@ bool Player::movePlayer(char input) {
 	if (playerTriedToMove) {
 
 		// health damage due to zombie infection
-		
-		if (_zombieInfectedMoves > 0) { 
+
+		if (_zombieInfectedMoves > 0) {
 
 			// do not perform a zombie infected move if zombie attacked in the previous move
 			if (_zombieAttackedNow) {
@@ -218,7 +220,7 @@ bool Player::movePlayer(char input) {
 				_currentHealth -= damage;
 				_zombieInfectedMoves--;
 
-				_addLog("Lost " + std::to_string(damage) + " health due to zombie infection." 
+				_addLog("Lost " + std::to_string(damage) + " health due to zombie infection."
 					+ std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
 
 				if (_currentHealth <= 0) { // player died
@@ -226,7 +228,7 @@ bool Player::movePlayer(char input) {
 					_currentLevel->erasePlayer(_posX, _posY);
 					_addLog("Player died!");
 				}
-			}			
+			}
 		}
 
 		// move enemies
@@ -247,11 +249,14 @@ std::string Player::getPlayerInfo() {
 	std::string healthStr = " Health: " + std::to_string(_currentHealth);
 	std::string moneyStr = " Money: " + std::to_string(_money);
 	std::string artifactsStr = " Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts());
+    std::string zombieInfText = " Zombie-infected Moves: " + std::to_string(_zombieInfectedMoves);
+    std::string shieldsText = " Shields: " + std::to_string(_shields);
 
 	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
 		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
-		+ std::string(plInfoWidth, ' ') + "|> " + _playerLog[3] + "\n";
+		+ zombieInfText + std::string(plInfoWidth - zombieInfText.size(), ' ') + "|> " + _playerLog[3] + "\n"
+		+ shieldsText + std::string(plInfoWidth - shieldsText.size(), ' ') + "|> " + _playerLog[4] + "\n";
 
 	return infoStr;
 }
@@ -398,7 +403,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 }
 
 void Player::_addLog(std::string logText) {
-	for (int i = 2; i >= 0; i--) {
+	for (int i = 3; i >= 0; i--) {
 		_playerLog[i + 1] = _playerLog[i];
 	}
 	_playerLog[0] = logText;

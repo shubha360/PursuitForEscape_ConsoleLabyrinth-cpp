@@ -3,11 +3,14 @@ LEVEL NAME
 NUMBER OF ROWS
 NUMBER OF COLLUMNS
 
+NUMBER OF ARTIFACTS IN THIS LEVEL
+
 PLAYER HEALTH
 PLAYER MONEY
 ARTIFACTS COLLECTED BY PLAYER
 
-NUMBER OF ARTIFACTS IN THIS LEVEL
+NUMBER OF ZOMBIE-INFECTED MOVES LEFT
+NUMBER OF SHIELDS LEFT
 
 LEVEL GRID STARTS HERE
 
@@ -24,6 +27,9 @@ S - Snake
 Z - Zombie
 W - Witch
 M - Monster
+$ - Random Money
++ - 10 Health
+* - Refill Health
 
 An example level -
 
@@ -32,11 +38,14 @@ Example level
 8
 10
 
+1
+
 100
 100
 0
 
-1
+0
+0
 
 ###########
 #      !  #

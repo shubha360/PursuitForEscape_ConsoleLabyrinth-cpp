@@ -78,6 +78,10 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
+    _inputStream >> _numberOfArtifacts;
+	getline(_inputStream, line);
+	getline(_inputStream, line);
+
 	_inputStream >> _playerHealth;
 	getline(_inputStream, line);
 
@@ -88,7 +92,9 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
-	_inputStream >> _numberOfArtifacts;
+	_inputStream >> _zombieInfMovesLeft;
+	getline(_inputStream, line);
+	_inputStream >> _shieldsLeft;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
@@ -145,7 +151,10 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	return true;
 }
 
-void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts) {
+void Level::saveLevel(int playerPosX, int playerPosY,
+                      int playerHealth, int playerMoney, int playerArtifacts,
+                      int zombieInfectedMoves, int shields) {
+
 	_outputStream.open(SAVE_FILE_LOCATION);
 
 	if (_outputStream.fail()) {
@@ -153,8 +162,9 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 	}
 
 	std::string output = _levelName + "\n\n" + std::to_string(_rows) + "\n" + std::to_string(_columns) + "\n\n"
+        + std::to_string(_numberOfArtifacts) + "\n\n"
 		+ std::to_string(playerHealth) + "\n" + std::to_string(playerMoney) + "\n" + std::to_string(playerArtifacts) + "\n\n"
-		+ std::to_string(_numberOfArtifacts) + "\n\n";
+		+ std::to_string(zombieInfectedMoves) + "\n" + std::to_string(shields) + "\n\n";
 
 	for (int i = 0; i < _rows; i++) {
 		output += _levelGrid[i];

@@ -3,11 +3,14 @@ Level 1
 30 - Rows
 60 - Columns
 
-10  - Player health (for saving)
+6 - Number of artifacts
+
+100  - Player health (for saving)
 100 - Player money (for saving)
 0 - Number of artifacts collected (for saving)
 
-6 - Number of artifacts
+0 - Zombie-infected Moves Remaining (for saving)
+0 - Shields (for saving)
 
 ############################################################
 #                       #                                  #
