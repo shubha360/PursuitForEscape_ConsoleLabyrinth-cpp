@@ -169,6 +169,9 @@ void GameManager::_printHowToPlay() {
 		"Z - Zombie\n"
 		"W - Witch\n"
 		"M - Monster\n"
+		"$ - Random Money ($5 - $50)\n"
+		"+ - 15 Health\n"
+		"* - Refill Health\n"
 		"\n\n\n"
 		"Controls:\n\n"
 		"W - Move Up\n"
@@ -178,7 +181,7 @@ void GameManager::_printHowToPlay() {
 		"N - New Game\n"
 		"M - Load Game\n"
 		"J - Save Game\n"
-		"L - Delete Save Game\n"
+		"K - Delete Save Game\n"
 		"Esc - Exit to main menu\n"
 		"\n\n";
 

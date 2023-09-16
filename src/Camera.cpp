@@ -12,7 +12,7 @@ const std::vector<std::string> Camera::_legend = {
 	"~  Escape Gate Unlocked | M - Load game",
 	"!  Artifacts            | ",
 	"1  Shop                 | J - Save game",
-	"2  Refill Health        | L - Delete Save Game",
+	"2  Refill Health        | K - Delete Save Game",
 	"3  Map View             | ",
 	"S  Snake                | Esc - Exit to main menu",
 	"Z  Zombie               | ",

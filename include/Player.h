@@ -40,6 +40,7 @@ private:
 	std::string _processAttackFromEnemy(Enemy* enemy, int damage); // processes attack from enemy and returns log text
 	std::string _processEnemyKill(Enemy* enemy); // processes enemy kill and returns log text
 
-	void _addLog(std::string logText);
+	void _addLog(std::string logText); // adds new log text to log array
+	void _increaseHealth(int amountToAdd); // increase health by specified amount
 };
 

@@ -122,7 +122,7 @@ bool Player::movePlayer(char input) {
 		_addLog("Started new game");
 		break;
 
-	case 'l': // delete save game
+	case 'k': // delete save game
 		_currentLevel->deleteSaveGame();
 		_addLog("Save game deleted");
 		break;
@@ -139,7 +139,7 @@ bool Player::movePlayer(char input) {
 		if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SNAKE ||
 			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ZOMBIE ||
 			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_WITCH ||
-			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_MONSTER) {
+			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_MONSTER) { // bumped into an enemy
 
 			Enemy* currentEnemy = _currentLevel->getEnemyGrid()[_posY][_posX];
 
@@ -151,7 +151,8 @@ bool Player::movePlayer(char input) {
 				_addLog("Player died!");
 			}
 		}
-		else {
+		else { // got something or escaped
+
             // collected an artifact
             if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ARTIFACT) {
                 _artifactsCollected++;
@@ -163,13 +164,31 @@ bool Player::movePlayer(char input) {
 					_addLog("All artifacts collected");
 					_addLog("Escape gate opened");
                 }
-
-                _currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
-                _camera->setCameraPosition(_posX, _posY);
             }
 
-            // game is ended if player accessed the escape gate
-            if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
+			// found random money
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_RANDOM_MONEY) {
+				static std::uniform_int_distribution<int> getRandomMoney(5, 50);
+				int gotMoney = getRandomMoney(Enemy::RandomEngine);
+
+				_money += gotMoney;
+				_addLog("Found " + std::to_string(gotMoney) + " currency.");
+			}
+
+			// found 10 health
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_10_HEALTH) {
+				_increaseHealth(15);
+				_addLog("Found 15 health.");
+			}
+
+			// found health refill
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_REFILL_HEALTH) {
+				_increaseHealth(100);
+				_addLog("Found health refill.");
+			}
+
+			// game is ended if player accessed the escape gate
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_GATE_OPEN) {
                 continueGame = false;
 				_addLog("Escaped!");
             }
@@ -355,13 +374,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 	switch (enemy->getType()) {
 
 	case EnemyType::SNAKE:
-
-		_currentHealth += 5;
-
-		if (_currentHealth > 100) {
-			_currentHealth = 100;
-		}
-
+		_increaseHealth(5);
 		affects = " and 5 health.";
 		break;
 
@@ -389,4 +402,12 @@ void Player::_addLog(std::string logText) {
 		_playerLog[i + 1] = _playerLog[i];
 	}
 	_playerLog[0] = logText;
+}
+
+void Player::_increaseHealth(int amountToAdd) {
+	_currentHealth += amountToAdd;
+
+	if (_currentHealth > 100) {
+		_currentHealth = 100;
+	}
 }

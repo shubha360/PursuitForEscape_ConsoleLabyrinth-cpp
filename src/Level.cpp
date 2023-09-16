@@ -11,6 +11,9 @@ const char Level::SIGN_SNAKE = 'S';
 const char Level::SIGN_ZOMBIE = 'Z';
 const char Level::SIGN_WITCH = 'W';
 const char Level::SIGN_MONSTER = 'M';
+const char Level::SIGN_RANDOM_MONEY = '$';
+const char Level::SIGN_10_HEALTH = '+';
+const char Level::SIGN_REFILL_HEALTH = '*';
 
 const std::string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
 const std::string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
@@ -105,32 +108,32 @@ bool Level::loadLevel(std::string currentFileLocation) {
 		for (int j = 0; j < line.size(); j++) {
 			switch (line[j]) {
 
-            case '@':
+            case SIGN_PLAYER:
                 _playerX = j;
                 _playerY = i;
                 break;
 
-            case 'X':
+            case SIGN_GATE_LOCKED:
                 _escapeX = j;
                 _escapeY = i;
                 break;
 
-			case 'S':
+			case SIGN_SNAKE:
 				_enemies.push_back(new Snake(j, i));
 				_enemyGrid[i][j] = _enemies.back();
 				break;
 
-			case 'Z':
+			case SIGN_ZOMBIE:
 				_enemies.push_back(new Zombie(j, i));
 				_enemyGrid[i][j] = _enemies.back();
 				break;
 
-			case 'W':
+			case SIGN_WITCH:
 				_enemies.push_back(new Witch(j, i));
 				_enemyGrid[i][j] = _enemies.back();
 				break;
 
-			case 'M':
+			case SIGN_MONSTER:
 				_enemies.push_back(new Monster(j, i));
 				_enemyGrid[i][j] = _enemies.back();
 				break;

@@ -18,6 +18,9 @@ public:
 	static const char SIGN_ZOMBIE;
 	static const char SIGN_WITCH;
 	static const char SIGN_MONSTER;
+	static const char SIGN_RANDOM_MONEY;
+	static const char SIGN_10_HEALTH;
+	static const char SIGN_REFILL_HEALTH;
 
 	static const std::string SAVE_FILE_LOCATION;
 	static const std::string SAVE_FILE_DEFAULT_TEXT;

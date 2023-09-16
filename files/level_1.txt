@@ -3,7 +3,7 @@ Level 1
 30 - Rows
 60 - Columns
 
-100 - Player health (for saving)
+10  - Player health (for saving)
 100 - Player money (for saving)
 0 - Number of artifacts collected (for saving)
 
@@ -15,7 +15,7 @@ Level 1
 #                       #                                  #
 #                       #                                  #
 #                 !     #              #####################
-#     @  Z              #              #                   #
+#     @                 #              #                   #
 #                       #              #   !               #
 #                       #              #                   #
 #                       #              #              !    #
