@@ -14,6 +14,7 @@ const char Level::SIGN_MONSTER = 'M';
 const char Level::SIGN_RANDOM_MONEY = '$';
 const char Level::SIGN_10_HEALTH = '+';
 const char Level::SIGN_REFILL_HEALTH = '*';
+const char Level::SIGN_SHIELD = '^';
 
 const std::string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
 const std::string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
@@ -191,7 +192,7 @@ void Level::deleteSaveGame() {
 // damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
 // enemyNameArr holds the name of the enemies
 // at most 3 enemies can attack the player
-void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageArr[], Enemy* enemyArr[]) {
+void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]) {
 
 	// keeping count of the attacking enemies
 	int attackerCount = 0;
@@ -208,7 +209,12 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int damageAr
 				damageArr[attackerCount] = damageHolder;
 				enemyArr[attackerCount] = _enemyGrid[yHolder][xHolder];
 
-				playerHealth -= damageHolder;
+                if (playerShields > 0) {
+                    playerShields--;
+                }
+                else {
+                    playerHealth -= damageHolder;
+                }
 				attackerCount++;
 			}
 			else if (damageHolder == -1) { // this enemy was attacked by the player

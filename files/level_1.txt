@@ -5,7 +5,7 @@ Level 1
 
 6 - Number of artifacts
 
-100  - Player health (for saving)
+40 - Player health (for saving)
 100 - Player money (for saving)
 0 - Number of artifacts collected (for saving)
 
