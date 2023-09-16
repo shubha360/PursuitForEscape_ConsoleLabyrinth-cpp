@@ -15,6 +15,9 @@ Player::Player() {
 	_currentHealth = -1;
 	_money = -1;
 	_artifactsCollected = -1;
+
+	_zombieInfectedMoves = 0;
+	_zombieAttackedNow = false;
 }
 
 Player::Player(Level* level, Camera* camera) {
@@ -30,6 +33,9 @@ Player::Player(Level* level, Camera* camera) {
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
 
+	_zombieInfectedMoves = 0;
+	_zombieAttackedNow = false;
+
 	_currentLevel->setPlayer(_posX, _posY);
 	_camera->setCameraPosition(_posX, _posY);
 }
@@ -39,8 +45,8 @@ bool Player::movePlayer(char input) {
 	// to determine if the game ended
 	bool continueGame = true;
 
-	// to trigger enemy movement
-	bool moveEnemies = false;
+	// any of w, a ,s, d was pressed
+	bool playerTriedToMove = false;
 
 	// store the old player coordinates before moving
 
@@ -52,7 +58,7 @@ bool Player::movePlayer(char input) {
 
 			_posY--;
 		}
-		moveEnemies = true;
+		playerTriedToMove = true;
 		break;
 
 	case 's': // move down
@@ -62,7 +68,7 @@ bool Player::movePlayer(char input) {
 
 			_posY++;
 		}
-		moveEnemies = true;
+		playerTriedToMove = true;
 		break;
 
 	case 'a': // move left
@@ -72,7 +78,7 @@ bool Player::movePlayer(char input) {
 
 			_posX--;
 		}
-		moveEnemies = true;
+		playerTriedToMove = true;
 		break;
 
 	case 'd': // move right
@@ -82,7 +88,7 @@ bool Player::movePlayer(char input) {
 
 			_posX++;
 		}
-		moveEnemies = true;
+		playerTriedToMove = true;
 		break;
 
 	case 'j': // save game
@@ -175,8 +181,36 @@ bool Player::movePlayer(char input) {
 		_oldY = _posY;
 	}
 
-	// move enemies
-	if (moveEnemies) {
+	// player triggered a movement
+	if (playerTriedToMove) {
+
+		// health damage due to zombie infection
+		
+		if (_zombieInfectedMoves > 0) { 
+
+			// do not perform a zombie infected move if zombie attacked in the previous move
+			if (_zombieAttackedNow) {
+				_zombieAttackedNow = false;
+			}
+			else {
+				static std::uniform_int_distribution<int> getZombieBiteDamage(2, 4);
+
+				int damage = getZombieBiteDamage(Enemy::RandomEngine);
+				_currentHealth -= damage;
+				_zombieInfectedMoves--;
+
+				_addLog("Lost " + std::to_string(damage) + " health due to zombie infection." 
+					+ std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
+
+				if (_currentHealth <= 0) { // player died
+					continueGame = false;
+					_currentLevel->erasePlayer(_posX, _posY);
+					_addLog("Player died!");
+				}
+			}			
+		}
+
+		// move enemies
 		if (!_moveEnemies()) { // false means player died
 			continueGame = false;
 			_addLog("Player died!");
@@ -287,7 +321,9 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
 		break;
 
 	case EnemyType::ZOMBIE:
-		affects = " and got 5 zombie-bitten move.";
+		_zombieInfectedMoves = 5;
+		_zombieAttackedNow = true;
+		affects = " and got 5 zombie-infected moves.";
 		break;
 
 	case EnemyType::WITCH:

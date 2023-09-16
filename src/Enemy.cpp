@@ -22,7 +22,7 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 			_resting = false;
 		}
 		else {
-			if (playerHealth > 0) {
+			if (playerHealth > 0) { // attack if player is still alive
 
 				static std::uniform_int_distribution<int> getAttacker(1, 2);
 
