@@ -5,12 +5,14 @@ Level 1
 
 6 - Number of artifacts
 
-40 - Player health (for saving)
-100 - Player money (for saving)
-0 - Number of artifacts collected (for saving)
+100 - Player health
+100 - Player money
+0 - Number of artifacts collected
+0 - Shields
 
-0 - Zombie-infected Moves Remaining (for saving)
-0 - Shields (for saving)
+0 - Zombie-infected Moves Remaining
+0 - Impaired Moves Remaining
+0 - Artifacts Hold by Monster
 
 ############################################################
 #                       #                                  #

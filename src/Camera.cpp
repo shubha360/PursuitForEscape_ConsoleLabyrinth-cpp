@@ -59,8 +59,8 @@ void Camera::setCameraPosition(int x, int y) {
 // render the view inside camera
 void Camera::render(std::string playerInfo) {
 	static const std::string topAndBottomLine = std::string(CAMERA_WIDTH, '-');
-	static const std::string screenIndentTop = std::string(30, '\n');
-	static const std::string screenIndentBottom = std::string(10, '\n');
+	static const std::string screenIndentTop = std::string(25, '\n');
+	static const std::string screenIndentBottom = std::string(15, '\n');
 	static const std::string screenIndentLeft = std::string(5, ' ');
 
 	int legendIterator = 0;

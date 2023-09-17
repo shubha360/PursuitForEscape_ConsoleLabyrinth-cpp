@@ -19,6 +19,8 @@ Player::Player() {
 
 	_zombieInfectedMoves = 0;
 	_zombieAttackedNow = false;
+	_impairedMoves = 0;
+	_artifactsOfMonster = 0;
 }
 
 Player::Player(Level* level, Camera* camera) {
@@ -36,52 +38,37 @@ bool Player::movePlayer(char input) {
 	// any of w, a ,s, d was pressed
 	bool playerTriedToMove = false;
 
-	// store the old player coordinates before moving
-
 	switch (input) {
-	case 'w': // move up
-		if (_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_WALL &&
-			_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_OPEN) {
+	case 'w':
+	case 's':
+	case 'a':
+	case 'd':
 
-			_posY--;
+		if (_impairedMoves > 0) {
+			_performAnImpairedMove();
 		}
-		playerTriedToMove = true;
-		break;
-
-	case 's': // move down
-		if (_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_WALL &&
-			_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_LOCKED) {
-
-			_posY++;
+		else {
+			if (input == 'w') {
+				_moveUp();
+			}
+			else if (input == 's') {
+				_moveDown();
+			}
+			else if (input == 'a') {
+				_moveLeft();
+			}
+			else if (input == 'd') {
+				_moveRight();
+			}
 		}
-		playerTriedToMove = true;
-		break;
 
-	case 'a': // move left
-		if (_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_WALL &&
-			_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_LOCKED) {
-
-			_posX--;
-		}
-		playerTriedToMove = true;
-		break;
-
-	case 'd': // move right
-		if (_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_WALL &&
-			_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_WALL &&
-			_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_LOCKED) {
-
-			_posX++;
-		}
 		playerTriedToMove = true;
 		break;
 
 	case 'j': // save game
 
-		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected, _zombieInfectedMoves, _shields);
+		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected, _shields, 
+			_zombieInfectedMoves, _impairedMoves, _artifactsOfMonster);
 		_addLog("Game saved");
 		break;
 
@@ -237,19 +224,23 @@ bool Player::movePlayer(char input) {
 }
 
 std::string Player::getPlayerInfo() {
-	static int plInfoWidth = 30;
+	static int plInfoWidth = 35;
 
 	std::string healthStr = " Health: " + std::to_string(_currentHealth);
 	std::string moneyStr = " Money: " + std::to_string(_money);
 	std::string artifactsStr = " Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts());
+	std::string shieldsText = " Shields: " + std::to_string(_shields);
     std::string zombieInfText = " Zombie-infected Moves: " + std::to_string(_zombieInfectedMoves);
-    std::string shieldsText = " Shields: " + std::to_string(_shields);
+	std::string impairedMovesText = " Impaired Moves: " + std::to_string(_impairedMoves);
+	std::string artifactsOfMonsterText = " Artifacts Hold By Monster: " + std::to_string(_artifactsOfMonster);
 
 	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
 		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
-		+ zombieInfText + std::string(plInfoWidth - zombieInfText.size(), ' ') + "|> " + _playerLog[3] + "\n"
-		+ shieldsText + std::string(plInfoWidth - shieldsText.size(), ' ') + "|> " + _playerLog[4] + "\n";
+		+ shieldsText + std::string(plInfoWidth - shieldsText.size(), ' ') + "|> " + _playerLog[3] + "\n"
+		+ zombieInfText + std::string(plInfoWidth - zombieInfText.size(), ' ') + "|> " + _playerLog[4] + "\n"
+		+ impairedMovesText + std::string(plInfoWidth - impairedMovesText.size(), ' ') + "|> " + _playerLog[5] + "\n"
+		+ artifactsOfMonsterText + std::string(plInfoWidth - artifactsOfMonsterText.size(), ' ') + "|> " + _playerLog[6] + "\n";
 
 	return infoStr;
 }
@@ -263,10 +254,13 @@ void Player::updatePlayerAfterGameStateChange() {
 	_currentHealth = _currentLevel->getPlayerHealth();
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
+	_shields = _currentLevel->getShields();
 
 	_zombieInfectedMoves = _currentLevel->getZombieInfectedMoves();
 	_zombieAttackedNow = false;
-	_shields = _currentLevel->getShields();
+
+	_impairedMoves = _currentLevel->getImpairedMoves();
+	_artifactsOfMonster = _currentLevel->getArtifactsHoldByMonster();
 
 	_currentLevel->setPlayer(_posX, _posY);
 	_camera->setCameraPosition(_posX, _posY);
@@ -357,10 +351,13 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
             break;
 
         case EnemyType::WITCH:
-            affects = " and took all the power ups for good.";
+			_impairedMoves += 3;
+            affects = " and got 3 impaired moves.";
             break;
 
         case EnemyType::MONSTER:
+			_artifactsOfMonster += _artifactsCollected;
+			_artifactsCollected = 0;
             affects = " and took all the artifacts.";
             break;
         }
@@ -398,7 +395,9 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 		break;
 
 	case EnemyType::MONSTER:
-		affects = " and the artifacts back.";
+		_artifactsCollected += _artifactsOfMonster;		
+		affects = " and " + std::to_string(_artifactsOfMonster) + " artifacts.";
+		_artifactsOfMonster = 0;
 		break;
 	}
 
@@ -409,7 +408,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 }
 
 void Player::_addLog(std::string logText) {
-	for (int i = 3; i >= 0; i--) {
+	for (int i = 5; i >= 0; i--) {
 		_playerLog[i + 1] = _playerLog[i];
 	}
 	_playerLog[0] = logText;
@@ -420,5 +419,87 @@ void Player::_increaseHealth(int amountToAdd) {
 
 	if (_currentHealth > 100) {
 		_currentHealth = 100;
+	}
+}
+
+void Player::_performAnImpairedMove() {
+	static std::uniform_int_distribution<int> getMove(0, 4);
+
+	int nextMove = getMove(Enemy::RandomEngine);
+	_impairedMoves--;
+
+	switch (nextMove) {
+
+	case 0: // no move
+		_addLog("Made no move due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		break;
+
+	case 1: // up
+		_moveUp();
+		_addLog("Moved up due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		break;
+
+	case 2: // down
+		_moveDown();
+		_addLog("Moved down due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		break;
+
+	case 3: // left
+		_moveLeft();
+		_addLog("Moved left due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		break;
+
+	case 4: // right
+		_moveRight();
+		_addLog("Moved right due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		break;
+	}
+}
+
+void Player::_moveUp() {
+	if (_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_WALL &&
+		_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_WALL &&
+		_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_OPEN) {
+
+		_posY--;
+	}
+	else {
+		_addLog("Moving up is blocked by something.");
+	}
+}
+
+void Player::_moveDown() {
+	if (_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_WALL &&
+		_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_WALL &&
+		_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_LOCKED) {
+
+		_posY++;
+	}
+	else {
+		_addLog("Moving down is blocked by something.");
+	}
+}
+
+void Player::_moveLeft() {
+	if (_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_WALL &&
+		_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_WALL &&
+		_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_LOCKED) {
+
+		_posX--;
+	}
+	else {
+		_addLog("Moving left is blocked by something.");
+	}
+}
+
+void Player::_moveRight() {
+	if (_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_WALL &&
+		_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_WALL &&
+		_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_LOCKED) {
+
+		_posX++;
+	}
+	else {
+		_addLog("Moving right is blocked by something.");
 	}
 }

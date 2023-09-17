@@ -138,8 +138,8 @@ void GameManager::_printHowToPlay() {
 		"It will be randomly determined who will attack whom. "
 		"Any enemy will be killed with a single attack. "
 		"Max health of player is 100 and game ends if the player dies from attack of an enemy.\n\n"
-		"There are various power ups available to collect or to buy from the shop. "
-		"Money is used to buy power ups. Money can be found around the labyrinth and by killing enemies. \n"
+		"There are various items available to collect or to buy from the shop. "
+		"Money is used to buy these items. Money can be found around the labyrinth and by killing enemies. \n"
 		"\n\n\n"
 		"There are 4 different type of enemies. Each has it's own characteristics and powers.\n\n"
 
@@ -147,15 +147,18 @@ void GameManager::_printHowToPlay() {
 		"Can be eaten after killing for gaining 5 health back. "
 		"Player earns 20 currency for killing a snake.\n\n"
 
-		"Zombie - Can deal 10 - 15 health damage to the player at once and then 2 - 4 health damage for each next 5 moves. "
+		"Zombie - Can deal 10 - 15 health damage to the player at once and then 2 - 4 health damage for each of next 5 moves. "
 		"Total 35 damage at the worst case. "
 		"Player earns 50 currency for killing a zombie.\n\n"
 
-		"Witch - Can deal 40 - 50 health damage to the player and take away all the powerups for good. "
+		"Witch - Can deal 40 - 50 health damage to the player and next 3 moves of the player will be impaired. "
+		"Impaired means the player can't move in the direction it intended to. The player will move in another direction. "
 		"Player earns 120 currency for killing a witch.\n\n"
 
-		"Monster - The strongest one. Can deal 75 - 95 health damage to the player. "
-		"Player earns 200 currency for killing a monster.\n\n"
+		"Monster - The strongest one. Can deal 75 - 95 health damage to the player and also take the artifacts player have. "
+		"Player earns 200 currency and the artifacts back for killing a monster. At most 1 monster will be in a level. "
+		"Monster may also hold artifacts from the start of the game. " 
+		"If all available artifacts are collected but still there are some artifacts left to collect, there should be a monster who is holding the artifacts. \n\n"
 
 		"\n\n\n"
 		"Symbols:\n\n"
