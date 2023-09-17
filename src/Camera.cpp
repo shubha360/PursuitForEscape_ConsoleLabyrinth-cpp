@@ -8,16 +8,16 @@ const std::vector<std::string> Camera::_legend = {
 	"",
 	"#  Wall                 | WASD - Player movement",
 	"=  Escape Gate Wall     | ",
-	"X  Escape Gate Locked   | N - New game",
-	"~  Escape Gate Unlocked | M - Load game",
+	"X  Escape Gate Locked   | R - Use Zombie Infection Healer",
+	"~  Escape Gate Unlocked | T - Use Impaired Movement Healer",
 	"!  Artifacts            | ",
-	"1  Shop                 | J - Save game",
-	"2  Refill Health        | K - Delete Save Game",
+	"1  Shop                 | N - New game",
+	"2  Refill Health        | M - Load game",
 	"3  Map View             | ",
-	"S  Snake                | Esc - Exit to main menu",
-	"Z  Zombie               | ",
+	"S  Snake                | J - Save game",
+	"Z  Zombie               | K - Delete Save Game",
 	"W  Witch                | ",
-	"M  Monster              | ",
+	"M  Monster              | Esc - Exit to main menu",
 	"$  Random Money         | ",
 	"+  10 Health            | ",
 	"^  Shield For an Attack | "
@@ -60,7 +60,7 @@ void Camera::setCameraPosition(int x, int y) {
 void Camera::render(std::string playerInfo) {
 	static const std::string topAndBottomLine = std::string(CAMERA_WIDTH, '-');
 	static const std::string screenIndentTop = std::string(25, '\n');
-	static const std::string screenIndentBottom = std::string(15, '\n');
+	static const std::string screenIndentBottom = std::string(10, '\n');
 	static const std::string screenIndentLeft = std::string(5, ' ');
 
 	int legendIterator = 0;

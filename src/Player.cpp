@@ -15,7 +15,10 @@ Player::Player() {
 	_currentHealth = -1;
 	_money = -1;
 	_artifactsCollected = -1;
+
     _shields = -1;
+    _zombieInfectionHealers = -1;
+    _impairedMovementHealers = -1;
 
 	_zombieInfectedMoves = 0;
 	_zombieAttackedNow = false;
@@ -62,20 +65,60 @@ bool Player::movePlayer(char input) {
 			}
 		}
 
+        if (_zombieInfectedMoves > 0) {
+            continueGame = _performAZombieInfectedMove();
+		}
+
 		playerTriedToMove = true;
 		break;
 
+    case 'r': // use zombie infection healer
+        if (_zombieInfectionHealers > 0) {
+
+            if (_zombieInfectedMoves == 0) {
+                _addLog("No zombie-infected moves left.");
+            }
+            else {
+                _zombieInfectedMoves = 0;
+                _zombieInfectionHealers--;
+                _addLog("Used a healer to heal zombie infection.");
+            }
+        }
+        else {
+            _addLog("No zombie infection healer left.");
+        }
+        break;
+
+    case 't': // use impaired movement healer
+
+        if (_impairedMovementHealers > 0) {
+
+            if (_impairedMoves == 0) {
+                _addLog("No impaired moves left.");
+            }
+            else {
+            _impairedMoves = 0;
+            _impairedMovementHealers--;
+            _addLog("Used a healer to heal impaired movement.");
+            }
+        }
+        else {
+            _addLog("No impaired movement healer left.");
+        }
+        break;
+
 	case 'j': // save game
 
-		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected, _shields, 
-			_zombieInfectedMoves, _impairedMoves, _artifactsOfMonster);
+		_currentLevel->saveLevel(_posX, _posY, _currentHealth, _money, _artifactsCollected,
+                           _shields, _zombieInfectionHealers, _impairedMovementHealers,
+                           _zombieInfectedMoves, _impairedMoves, _artifactsOfMonster);
+
 		_addLog("Game saved");
 		break;
 
 	case 'm': // load game
 		if (!_currentLevel->loadLevel(Level::SAVE_FILE_LOCATION)) {
 			_addLog("No load game exists");
-			// std::cout << "No load game exists!\n\n";
 		}
 		else {
 			updatePlayerAfterGameStateChange();
@@ -94,6 +137,7 @@ bool Player::movePlayer(char input) {
 		// prevent triggering player moving functionality
 		_oldX = _posX;
 		_oldY = _posY;
+
 		_addLog("Started new game");
 		break;
 
@@ -184,38 +228,11 @@ bool Player::movePlayer(char input) {
 	// player triggered a movement and if player did not die
 	if (playerTriedToMove && continueGame) {
 
-		// health damage due to zombie infection
-		if (_zombieInfectedMoves > 0) {
+        continueGame = _moveEnemies();
 
-			// do not perform a zombie infected move if zombie attacked in the previous move
-			if (_zombieAttackedNow) {
-				_zombieAttackedNow = false;
-			}
-			else {
-				static std::uniform_int_distribution<int> getZombieBiteDamage(2, 4);
-
-				int damage = getZombieBiteDamage(Enemy::RandomEngine);
-				_currentHealth -= damage;
-				_zombieInfectedMoves--;
-
-				_addLog("Lost " + std::to_string(damage) + " health due to zombie infection."
-					+ std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
-
-				if (_currentHealth <= 0) { // player died
-					continueGame = false;
-					_currentLevel->erasePlayer(_posX, _posY);
-					_addLog("Player died!");
-				}
-			}
-		}
-
-		// move enemies if player did not die
-		if (continueGame) {
-            if (!_moveEnemies()) { // false means player died
-                continueGame = false;
-                _addLog("Player died!");
-            }
-		}
+        if (!continueGame) { // false means player died
+            _addLog("Player died!");
+        }
 	}
 
 	_camera->render(getPlayerInfo());
@@ -230,6 +247,8 @@ std::string Player::getPlayerInfo() {
 	std::string moneyStr = " Money: " + std::to_string(_money);
 	std::string artifactsStr = " Artifacts Collected: " + std::to_string(_artifactsCollected) + " / " + std::to_string(_currentLevel->getNumberOfArtifacts());
 	std::string shieldsText = " Shields: " + std::to_string(_shields);
+	std::string zombieInfHealersText = " Zombie Infection Healers: " + std::to_string(_zombieInfectionHealers);
+	std::string impairedMoveHealersText = " Impaired Movement Healers: " + std::to_string(_impairedMovementHealers);
     std::string zombieInfText = " Zombie-infected Moves: " + std::to_string(_zombieInfectedMoves);
 	std::string impairedMovesText = " Impaired Moves: " + std::to_string(_impairedMoves);
 	std::string artifactsOfMonsterText = " Artifacts Hold By Monster: " + std::to_string(_artifactsOfMonster);
@@ -237,10 +256,14 @@ std::string Player::getPlayerInfo() {
 	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
 		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
-		+ shieldsText + std::string(plInfoWidth - shieldsText.size(), ' ') + "|> " + _playerLog[3] + "\n"
-		+ zombieInfText + std::string(plInfoWidth - zombieInfText.size(), ' ') + "|> " + _playerLog[4] + "\n"
-		+ impairedMovesText + std::string(plInfoWidth - impairedMovesText.size(), ' ') + "|> " + _playerLog[5] + "\n"
-		+ artifactsOfMonsterText + std::string(plInfoWidth - artifactsOfMonsterText.size(), ' ') + "|> " + _playerLog[6] + "\n";
+		+ std::string(plInfoWidth, ' ') + "|> " + _playerLog[3] + "\n"
+		+ shieldsText + std::string(plInfoWidth - shieldsText.size(), ' ') + "|> " + _playerLog[4] + "\n"
+		+ zombieInfHealersText + std::string(plInfoWidth - zombieInfHealersText.size(), ' ') + "|> " + _playerLog[5] + "\n"
+		+ impairedMoveHealersText + std::string(plInfoWidth - impairedMoveHealersText.size(), ' ') + "|> " + _playerLog[6] + "\n"
+		+ std::string(plInfoWidth, ' ') + "|> " + _playerLog[7] + "\n"
+		+ zombieInfText + std::string(plInfoWidth - zombieInfText.size(), ' ') + "|> " + _playerLog[8] + "\n"
+		+ impairedMovesText + std::string(plInfoWidth - impairedMovesText.size(), ' ') + "|> " + _playerLog[9] + "\n"
+		+ artifactsOfMonsterText + std::string(plInfoWidth - artifactsOfMonsterText.size(), ' ') + "|> " + _playerLog[10] + "\n";
 
 	return infoStr;
 }
@@ -254,7 +277,10 @@ void Player::updatePlayerAfterGameStateChange() {
 	_currentHealth = _currentLevel->getPlayerHealth();
 	_money = _currentLevel->getPlayerMoney();
 	_artifactsCollected = _currentLevel->getArtifactsCollected();
+
 	_shields = _currentLevel->getShields();
+	_zombieInfectionHealers = _currentLevel->getZombieInfectionHealers();
+	_impairedMovementHealers = _currentLevel->getImpairedMoveHealers();
 
 	_zombieInfectedMoves = _currentLevel->getZombieInfectedMoves();
 	_zombieAttackedNow = false;
@@ -395,7 +421,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 		break;
 
 	case EnemyType::MONSTER:
-		_artifactsCollected += _artifactsOfMonster;		
+		_artifactsCollected += _artifactsOfMonster;
 		affects = " and " + std::to_string(_artifactsOfMonster) + " artifacts.";
 		_artifactsOfMonster = 0;
 		break;
@@ -408,7 +434,7 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 }
 
 void Player::_addLog(std::string logText) {
-	for (int i = 5; i >= 0; i--) {
+	for (int i = 9; i >= 0; i--) {
 		_playerLog[i + 1] = _playerLog[i];
 	}
 	_playerLog[0] = logText;
@@ -422,6 +448,32 @@ void Player::_increaseHealth(int amountToAdd) {
 	}
 }
 
+// returns false if player died during the move
+bool Player::_performAZombieInfectedMove() {
+    bool playerAlive = true;
+    // do not perform a zombie infected move if zombie attacked in the previous move
+    if (_zombieAttackedNow) {
+        _zombieAttackedNow = false;
+    }
+    else {
+        static std::uniform_int_distribution<int> getZombieBiteDamage(2, 4);
+
+        int damage = getZombieBiteDamage(Enemy::RandomEngine);
+        _currentHealth -= damage;
+        _zombieInfectedMoves--;
+
+        _addLog("Lost " + std::to_string(damage) + " health due to zombie infection."
+            + std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
+
+        if (_currentHealth <= 0) { // player died
+            _currentLevel->erasePlayer(_posX, _posY);
+            _addLog("Player died!");
+            playerAlive = false;
+        }
+    }
+    return playerAlive;
+}
+
 void Player::_performAnImpairedMove() {
 	static std::uniform_int_distribution<int> getMove(0, 4);
 
@@ -431,27 +483,27 @@ void Player::_performAnImpairedMove() {
 	switch (nextMove) {
 
 	case 0: // no move
-		_addLog("Made no move due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		_addLog("Made no move due to impaired movement. " + std::to_string(_impairedMoves) + " more impaired move remains");
 		break;
 
 	case 1: // up
 		_moveUp();
-		_addLog("Moved up due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		_addLog("Moved up due to impaired movement. " + std::to_string(_impairedMoves) + " more impaired move remains");
 		break;
 
 	case 2: // down
 		_moveDown();
-		_addLog("Moved down due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		_addLog("Moved down due to impaired movement. " + std::to_string(_impairedMoves) + " more impaired move remains");
 		break;
 
 	case 3: // left
 		_moveLeft();
-		_addLog("Moved left due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		_addLog("Moved left due to impaired movement. " + std::to_string(_impairedMoves) + " more impaired move remains");
 		break;
 
 	case 4: // right
 		_moveRight();
-		_addLog("Moved right due to impaired movement. Impaired movement remaining: " + std::to_string(_impairedMoves));
+		_addLog("Moved right due to impaired movement. " + std::to_string(_impairedMoves) + " more impaired move remains");
 		break;
 	}
 }

@@ -8,7 +8,10 @@ NUMBER OF ARTIFACTS IN THIS LEVEL
 PLAYER HEALTH
 PLAYER MONEY
 ARTIFACTS COLLECTED BY PLAYER
-NUMBER OF SHIELDS LEFT
+
+NUMBER OF SHIELDS
+NUMBER OF ZOMBIE INFECTION HEALER
+NUMBER OF IMPAIRED MOVEMENT HEALER
 
 NUMBER OF ZOMBIE-INFECTED MOVES LEFT
 NUMBER OF IMPAIRED MOVES LEFT
@@ -20,7 +23,7 @@ LEVEL GRID STARTS HERE
 The level file should be formatted exactly according to above format. Proper game experience may not be achieved otherwise.
 
 -> There should be at most 1 monster in a level.
--> Availalbe artifacts in the level + artifacts hold by monster should be equal to total number of artifacts in this level.
+-> Available artifacts in the level + artifacts hold by monster should be equal to total number of artifacts in this level.
 
 @ - Player
 # - Wall

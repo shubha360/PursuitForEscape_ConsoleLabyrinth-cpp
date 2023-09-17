@@ -30,7 +30,8 @@ public:
 	~Level();
 	void addLevelFile(std::string levelFileLocation);
 	bool loadLevel(std::string currentFileLocation);
-	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts, int shields, 
+	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts,
+                int shields, int zombieInfectionHealers, int impairedMoveHealers,
                 int zombieInfectedMoves, int impairedMoves, int artifactsOfMonster);
 	void deleteSaveGame();
 	char getTileAtGrid(int x, int y); // get the character at xy coordinate
@@ -59,7 +60,9 @@ public:
 	int getPlayerHealth() { return _playerHealth; }
 	int getPlayerMoney() { return _playerMoney; }
 	int getArtifactsCollected() { return _artifactsCollected; }
-	int getShields() { return _shieldsLeft; }
+	int getShields() { return _shields; }
+	int getZombieInfectionHealers() { return _zombieInfHealers; }
+	int getImpairedMoveHealers() { return _impairedMovementHealers; }
 	int getZombieInfectedMoves() { return _zombieInfMovesLeft; }
 	int getImpairedMoves() { return _impairedMovesLeft; }
 	int getArtifactsHoldByMonster() { return _artifactsOfMonster; }
@@ -80,7 +83,8 @@ private:
 
 	int _rows, _columns;
 	int _playerX, _playerY;
-	int _playerHealth, _playerMoney, _artifactsCollected, _shieldsLeft;
+	int _playerHealth, _playerMoney, _artifactsCollected;
+	int _shields, _zombieInfHealers, _impairedMovementHealers;
 	int _zombieInfMovesLeft, _impairedMovesLeft, _artifactsOfMonster;
 	int _numberOfArtifacts;
 	bool _levelLoaded;

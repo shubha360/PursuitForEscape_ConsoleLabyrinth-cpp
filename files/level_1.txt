@@ -5,14 +5,17 @@ Level 1
 
 6 - Number of artifacts
 
-100 - Player health
+10 - Player health
 100 - Player money
 0 - Number of artifacts collected
-0 - Shields
 
-0 - Zombie-infected Moves Remaining
-0 - Impaired Moves Remaining
-0 - Artifacts Hold by Monster
+0 - Shields
+1 - Zombie infection healer
+1 - Impaired movement healer
+
+5 - Zombie-infected moves remaining
+0 - Impaired moves remaining
+0 - Artifacts hold by monster
 
 ############################################################
 #                       #                                  #
@@ -20,7 +23,7 @@ Level 1
 #                       #                                  #
 #                       #                                  #
 #                 !     #              #####################
-#     @                 #              #                   #
+#@                      #              #                   #
 #                       #              #   !               #
 #                       #              #                   #
 #                       #              #              !    #

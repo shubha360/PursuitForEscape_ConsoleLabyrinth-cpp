@@ -89,7 +89,13 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	_inputStream >> _artifactsCollected;
 	getline(_inputStream, line);
-	_inputStream >> _shieldsLeft;
+	getline(_inputStream, line);
+
+	_inputStream >> _shields;
+	getline(_inputStream, line);
+	_inputStream >> _zombieInfHealers;
+	getline(_inputStream, line);
+	_inputStream >> _impairedMovementHealers;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
@@ -154,7 +160,8 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	return true;
 }
 
-void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts, int shields,
+void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts,
+                      int shields, int zombieInfectionHealers, int impairedMoveHealers,
                       int zombieInfectedMoves, int impairedMoves, int artifactsOfMonster) {
 
 	_outputStream.open(SAVE_FILE_LOCATION);
@@ -165,7 +172,8 @@ void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int play
 
 	std::string output = _levelName + "\n\n" + std::to_string(_rows) + "\n" + std::to_string(_columns) + "\n\n"
         + std::to_string(_numberOfArtifacts) + "\n\n"
-		+ std::to_string(playerHealth) + "\n" + std::to_string(playerMoney) + "\n" + std::to_string(playerArtifacts) + std::to_string(shields) + "\n\n"
+		+ std::to_string(playerHealth) + "\n" + std::to_string(playerMoney) + "\n" + std::to_string(playerArtifacts) + "\n\n"
+		+ std::to_string(shields) + "\n" + std::to_string(zombieInfectionHealers) + "\n" + std::to_string(impairedMoveHealers) + "\n\n"
 		+ std::to_string(zombieInfectedMoves) + "\n" + std::to_string(impairedMoves) + "\n" + std::to_string(artifactsOfMonster) + "\n\n";
 
 	for (int i = 0; i < _rows; i++) {

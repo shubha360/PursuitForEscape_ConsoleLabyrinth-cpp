@@ -29,14 +29,17 @@ private:
 	int _currentHealth;
 	int _money;
 	int _artifactsCollected;
+
 	int _shields;
+	int _zombieInfectionHealers;
+	int _impairedMovementHealers;
 
 	int _zombieInfectedMoves; // remaining zombie infected moves after got bitten by zombie
 	bool _zombieAttackedNow; // to determine if zombie attacked in the previous move
 	int _impairedMoves;
 	int _artifactsOfMonster;
 
-	std::string _playerLog[7] {"", "", "", "", "", "", ""}; // to store the logs
+	std::string _playerLog[11] {"", "", "", "", "", "", "", "", "", "", ""}; // to store the logs
 
 	void _combatEnemy(Enemy* enemy);
 	bool _moveEnemies(); // moves enemies after player moves, returns false if player died from an enemy attack
@@ -45,6 +48,7 @@ private:
 
 	void _addLog(std::string logText); // adds new log text to log array
 	void _increaseHealth(int amountToAdd); // increase health by specified amount
+	bool _performAZombieInfectedMove(); // returns false if player died during the move
 	void _performAnImpairedMove();
 
 	void _moveUp();
