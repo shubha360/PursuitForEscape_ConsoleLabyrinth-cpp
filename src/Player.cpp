@@ -152,8 +152,9 @@ bool Player::movePlayer(char input) {
 		break;
 	}
 
-	// different old and new coordinates mean player moved
-	if (_posX != _oldX || _posY != _oldY) {
+	// different old and new coordinates mean player moved to a new tile
+	// check new tile for enemy or collectible if player didn't die due to zombie infection
+	if ((_posX != _oldX || _posY != _oldY) && continueGame) {
 
 		if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SNAKE ||
 			_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_ZOMBIE ||
@@ -210,6 +211,12 @@ bool Player::movePlayer(char input) {
 			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SHIELD) {
 				_shields++;
 				_addLog("Found a shield. Total shields " + std::to_string(_shields) + ".");
+			}
+
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_MAP_VIEW) {
+				_addLog("Opened map view.");
+				_camera->openMapView(getPlayerInfo());
+				_addLog("Exited view map.");
 			}
 
 			// game is ended if player accessed the escape gate
@@ -451,7 +458,8 @@ void Player::_increaseHealth(int amountToAdd) {
 // returns false if player died during the move
 bool Player::_performAZombieInfectedMove() {
     bool playerAlive = true;
-    // do not perform a zombie infected move if zombie attacked in the previous move
+    
+	// do not perform a zombie infected move if a zombie attacked in the previous move
     if (_zombieAttackedNow) {
         _zombieAttackedNow = false;
     }
@@ -466,7 +474,7 @@ bool Player::_performAZombieInfectedMove() {
             + std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
 
         if (_currentHealth <= 0) { // player died
-            _currentLevel->erasePlayer(_posX, _posY);
+            _currentLevel->erasePlayer(_oldX, _oldY);
             _addLog("Player died!");
             playerAlive = false;
         }

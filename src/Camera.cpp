@@ -11,16 +11,16 @@ const std::vector<std::string> Camera::_legend = {
 	"X  Escape Gate Locked   | R - Use Zombie Infection Healer",
 	"~  Escape Gate Unlocked | T - Use Impaired Movement Healer",
 	"!  Artifacts            | ",
-	"1  Shop                 | N - New game",
-	"2  Refill Health        | M - Load game",
-	"3  Map View             | ",
-	"S  Snake                | J - Save game",
-	"Z  Zombie               | K - Delete Save Game",
-	"W  Witch                | ",
-	"M  Monster              | Esc - Exit to main menu",
+	"0  Shop                 | N - New game",
+	"S  Snake                | M - Load game",
+	"Z  Zombie               | ",
+	"W  Witch                | J - Save game",
+	"M  Monster              | K - Delete Save Game",
 	"$  Random Money         | ",
-	"+  10 Health            | ",
-	"^  Shield For an Attack | "
+	"+  10 Health            | Esc - Exit to main menu",
+	"*  Refill Health        | ",
+	"^  Shield For an Attack | ",
+	"&  Map View             | ",
 };
 
 Camera::Camera() {
@@ -58,36 +58,107 @@ void Camera::setCameraPosition(int x, int y) {
 
 // render the view inside camera
 void Camera::render(std::string playerInfo) {
-	static const std::string topAndBottomLine = std::string(CAMERA_WIDTH, '-');
-	static const std::string screenIndentTop = std::string(25, '\n');
-	static const std::string screenIndentBottom = std::string(10, '\n');
-	static const std::string screenIndentLeft = std::string(5, ' ');
+	_captureAndPrint(_posX, _posY, false, playerInfo);
+}
+
+void Camera::openMapView(std::string playerInfo) {
+	int viewMapPosX = 0;
+	int viewMapPosY = 0;
+
+	// for reducing print calls
+	int oldViewMapPosX = viewMapPosX;
+	int oldViewMapPosY = viewMapPosY;
+
+	_captureAndPrint(viewMapPosX, viewMapPosY, true, playerInfo);
+
+	char input = ' ';
+
+	do {		
+
+		if (oldViewMapPosX != viewMapPosX || oldViewMapPosY != viewMapPosY) {
+			
+			_captureAndPrint(viewMapPosX, viewMapPosY, true, playerInfo);
+			oldViewMapPosX = viewMapPosX;
+			oldViewMapPosY = viewMapPosY;
+		}
+
+		input = _getch();
+
+		switch (input) {
+		case 'w':
+			if (viewMapPosY > 0) {
+				viewMapPosY--;
+			}
+			break;
+
+		case 's':
+			if (viewMapPosY + CAMERA_HEIGHT < _currentLevel->getRows()) {
+				viewMapPosY++;
+			}
+			break;
+
+		case 'a':
+			if (viewMapPosX > 0) {
+				viewMapPosX--;
+			}
+			break;
+
+		case 'd':
+			if (viewMapPosX + CAMERA_WIDTH < _currentLevel->getColumns()) {
+				viewMapPosX++;
+			}
+			break;
+		}
+
+	} while (input != 27);
+}
+
+void Camera::_captureAndPrint(int cameraPosX, int cameraPosY, bool viewMapMode, std::string playerInfo) {
+	static const std::string _topAndBottomLine(CAMERA_WIDTH, '-');
+	static const std::string _screenIndentTop(25, '\n');
+	static const std::string _screenIndentBottom(10, '\n');
+	static const std::string _screenIndentLeft(5, ' ');
+
+	static std::string viewMapHeading =
+		"###        ###      ###      ######      ##          ## ########## ######### ##                 ##\n"
+		"## ##    ## ##     ## ##     ##   ##      ##        ##      ##     ##         ##               ## \n"
+		"##  ##  ##  ##    ##   ##    ##   ##       ##      ##       ##     ######      ##     ###     ##  \n"
+		"##    ##    ##   #########   ######         ##    ##        ##     ######       ##   ## ##   ##   \n"
+		"##          ##  ##       ##  ##              ##  ##         ##     ##            ## ##   ## ##    \n"
+		"##          ## ##         ## ##                ##       ########## #########      ###     ###     \n"
+		"\n"
+		"Use WASD to move around.\n"
+		"Press Esc to exit map view.\n\n";
 
 	int legendIterator = 0;
-	std::string levelString = screenIndentTop;
+	std::string levelString = _screenIndentTop;
 
-	for (int y = _posY - 1; y <= _posY + CAMERA_HEIGHT; y++) {
+	if (viewMapMode) {
+		levelString += viewMapHeading;
+	}
+
+	for (int y = cameraPosY - 1; y <= cameraPosY + CAMERA_HEIGHT; y++) {
 
 		// print top and bottom borders
-		if (y == _posY - 1 || y == _posY + CAMERA_HEIGHT) {
-			levelString += screenIndentLeft + " " + topAndBottomLine;
+		if (y == cameraPosY - 1 || y == cameraPosY + CAMERA_HEIGHT) {
+			levelString += _screenIndentLeft + " " + _topAndBottomLine;
 		}
 
 		// else print level lines
 		else {
-			for (int x = _posX - 1; x <= _posX + CAMERA_WIDTH; x++) {
+			for (int x = cameraPosX - 1; x <= cameraPosX + CAMERA_WIDTH; x++) {
 
 				// print left and right borders
-				if (x == _posX - 1 || x == _posX + CAMERA_WIDTH) {
+				if (x == cameraPosX - 1 || x == cameraPosX + CAMERA_WIDTH) {
 
-					if (x == _posX - 1) {
-						levelString += screenIndentLeft;
+					if (x == cameraPosX - 1) {
+						levelString += _screenIndentLeft;
 					}
 
 					levelString += "|";
 
 					// print legend at the right of the game view
-					if (x == _posX + CAMERA_WIDTH && y >= 0 && legendIterator < _legend.size()) {
+					if (x == cameraPosX + CAMERA_WIDTH && y >= 0 && legendIterator < _legend.size()) {
 						levelString += "  " + _legend[legendIterator++];
 					}
 				}
@@ -103,7 +174,7 @@ void Camera::render(std::string playerInfo) {
 
 	levelString += "\n";
 	levelString += playerInfo;
-	levelString += screenIndentBottom;
+	levelString += _screenIndentBottom;
 
 	std::cout << levelString;
 }

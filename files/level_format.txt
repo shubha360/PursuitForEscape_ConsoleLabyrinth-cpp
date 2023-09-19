@@ -38,6 +38,7 @@ M - Monster
 $ - Random Money
 + - 10 Health
 * - Refill Health
+& - Map View
 
 An example level -
 
