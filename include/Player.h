@@ -47,7 +47,7 @@ private:
 	std::string _processEnemyKill(Enemy* enemy); // processes enemy kill and returns log text
 
 	void _addLog(std::string logText); // adds new log text to log array
-	void _increaseHealth(int amountToAdd); // increase health by specified amount
+	void _increaseHealth(int amountToIncrease); // increase health by specified amount
 	bool _performAZombieInfectedMove(); // returns false if player died during the move
 	void _performAnImpairedMove();
 
@@ -55,5 +55,8 @@ private:
 	void _moveDown();
 	void _moveLeft();
 	void _moveRight();
+
+	void _enterShop(); // starts the shop
+	bool _buyItem(std::string itemName, int itemPrize); // returns true if player has eneough money
 };
 

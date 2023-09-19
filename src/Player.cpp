@@ -213,10 +213,22 @@ bool Player::movePlayer(char input) {
 				_addLog("Found a shield. Total shields " + std::to_string(_shields) + ".");
 			}
 
+			// found map view
 			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_MAP_VIEW) {
 				_addLog("Opened map view.");
 				_camera->openMapView(getPlayerInfo());
-				_addLog("Exited view map.");
+				_addLog("Exited map view.");
+			}
+
+			// enter shop
+			else if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SHOP) {
+				_addLog("Entered shop.");
+				_enterShop();
+				_addLog("Exited shop.");
+
+				// shop should not be removed from level, setting player to the previous position
+				_posX = _oldX;
+				_posY = _oldY;
 			}
 
 			// game is ended if player accessed the escape gate
@@ -224,10 +236,10 @@ bool Player::movePlayer(char input) {
                 continueGame = false;
 				_addLog("Escaped!");
             }
-
-			_currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
-			_camera->setCameraPosition(_posX, _posY);
 		}
+		_currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
+		_camera->setCameraPosition(_posX, _posY);
+
 		_oldX = _posX;
 		_oldY = _posY;
 	}
@@ -303,8 +315,8 @@ void Player::_combatEnemy(Enemy* enemy) {
     if (enemy->isALive()) {
         static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-        //int attacker = getAttacker(Enemy::RandomEngine);
-		int attacker = 2;
+        int attacker = getAttacker(Enemy::RandomEngine);
+		//int attacker = 2;
 
 		std::string log;
 
@@ -434,9 +446,6 @@ std::string Player::_processEnemyKill(Enemy* enemy) {
 		break;
 	}
 
-	_currentLevel->setPlayer(_posX, _posY, _oldX, _oldY);
-	_camera->setCameraPosition(_posX, _posY);
-
 	return " Got " + std::to_string(enemy->getMoney()) + " currency" + affects;
 }
 
@@ -447,8 +456,8 @@ void Player::_addLog(std::string logText) {
 	_playerLog[0] = logText;
 }
 
-void Player::_increaseHealth(int amountToAdd) {
-	_currentHealth += amountToAdd;
+void Player::_increaseHealth(int amountToIncrease) {
+	_currentHealth += amountToIncrease;
 
 	if (_currentHealth > 100) {
 		_currentHealth = 100;
@@ -470,7 +479,7 @@ bool Player::_performAZombieInfectedMove() {
         _currentHealth -= damage;
         _zombieInfectedMoves--;
 
-        _addLog("Lost " + std::to_string(damage) + " health due to zombie infection."
+        _addLog("Lost " + std::to_string(damage) + " health due to zombie infection. "
             + std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
 
         if (_currentHealth <= 0) { // player died
@@ -562,4 +571,131 @@ void Player::_moveRight() {
 	else {
 		_addLog("Moving right is blocked by something.");
 	}
+}
+
+void Player::_enterShop() {
+
+	bool inTheShop = true; // shop loop
+
+	static const int totalItems = 8;
+
+	static const std::string topIndent(30, '\n');
+
+	static std::string shopAndItems =
+		"  ########  ##     ##  #########  #########\n"
+		"  ##    ##  ##     ##  ##     ##  ##     ##\n"
+		"  ##        ##     ##  ##     ##  ##     ##\n"
+		"  ########  #########  ##     ##  #########\n"
+		"        ##  ##     ##  ##     ##  ##       \n"
+		"  ##    ##  ##     ##  ##     ##  ##       \n"
+		"  ########  ##     ##  #########  ##       \n"
+		"\n\n"
+		"  1. Zombie Infection Healer    - 30  currency \n"
+		"  2. Impaired Movement Healer   - 20  currency \n"
+		"  3. 10 Health                  - 25  currency \n"
+		"  4. 20 Health                  - 45  currency \n"
+		"  5. 50 Health                  - 100 currency \n"
+		"  6. 3 Shields                  - 50  currency \n"
+		"  7. 5 Shields                  - 80  currency \n"
+		"  8. Map View                   - 10  currency \n"
+		"  Esc. Exit shop                - 0   currency \n"
+		"\n\n"
+		"  Player has -> \n\n";
+	
+	std::string heading = topIndent + shopAndItems;
+
+	std::cout << heading;
+		
+	do {
+		std::string inputPrompt =
+			"  Health: " + std::to_string(_currentHealth) + ", Money: " + std::to_string(_money) + ", Shields: " + std::to_string(_shields) + "\n"
+			+ "  Zombie Infection Healers: " + std::to_string(_zombieInfectionHealers) + ", Impaired Movement Healers: " + std::to_string(_impairedMovementHealers) + "\n"
+			+ "  Zombie-infected Moves: " + std::to_string(_zombieInfectedMoves) + ", Impaired Moves: " + std::to_string(_impairedMoves) + "\n\n"
+			+ "  Enter the index of the item to buy: ";
+
+		std::cout << inputPrompt;
+
+		int input = _getch() - 48;
+		std::cout << input;
+
+		switch (input) {
+
+		case 1:
+			if (_buyItem("Zombie Infection Healer", 30)) {
+				_zombieInfectionHealers++;
+			}
+			break;
+
+		case 2:
+			if (_buyItem("Impaired Movement Healer", 20)) {
+				_impairedMovementHealers++;
+			}
+			break;
+
+		case 3:
+			if (_buyItem("10 health", 25)) {
+				_increaseHealth(10);
+			}
+			break;
+
+		case 4:
+			if (_buyItem("20 health", 45)) {
+				_increaseHealth(20);
+			}
+			break;
+
+		case 5:
+			if (_buyItem("50 health", 100)) {
+				_increaseHealth(50);
+			}
+			break;
+
+		case 6:
+			if (_buyItem("3 Shields", 50)) {
+				_shields += 3;
+			}
+			break;
+
+		case 7:
+			if (_buyItem("5 Shields", 80)) {
+				_shields += 5;
+			}
+			break;
+
+		case 8:
+			if (_buyItem("Map View", 10)) {
+				_camera->openMapView(getPlayerInfo());
+				std::cout << heading;
+			}
+			break;
+
+		case -21:
+			inTheShop = false;
+			break;
+
+		default:
+			std::cout << ". Invalid item index. Please try again.\n\n";
+			break;
+		}
+
+	} while (inTheShop);
+}
+
+// returns true if player has enough money to but this item
+bool Player::_buyItem(std::string itemName, int itemPrize) {
+	std::string output = "";
+	bool bought = true;
+	
+	if (itemPrize > _money) {
+		output += ". Insufficient fund to buy this item.";
+	}
+	else {
+		_money -= itemPrize;
+		output += ". Bought " + itemName + ".";
+	}
+
+	output += "\n\n";
+	std::cout << output;
+
+	return bought;
 }

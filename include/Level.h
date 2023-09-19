@@ -23,6 +23,7 @@ public:
 	static const char SIGN_REFILL_HEALTH;
 	static const char SIGN_SHIELD;
 	static const char SIGN_MAP_VIEW;
+	static const char SIGN_SHOP;
 
 	static const std::string SAVE_FILE_LOCATION;
 	static const std::string SAVE_FILE_DEFAULT_TEXT;

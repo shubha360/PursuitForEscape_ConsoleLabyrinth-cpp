@@ -26,8 +26,8 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 
 				static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-				//int attacker = getAttacker(RandomEngine);
-				int attacker = 1;
+				int attacker = getAttacker(RandomEngine);
+				//int attacker = 1;
 
 				switch (attacker) {
 				case 1: // enemy attack

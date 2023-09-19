@@ -16,6 +16,7 @@ const char Level::SIGN_10_HEALTH = '+';
 const char Level::SIGN_REFILL_HEALTH = '*';
 const char Level::SIGN_SHIELD = '^';
 const char Level::SIGN_MAP_VIEW = '&';
+const char Level::SIGN_SHOP = '0';
 
 const std::string Level::SAVE_FILE_LOCATION = "files/save_file.txt";
 const std::string Level::SAVE_FILE_DEFAULT_TEXT = "NO SAVE DATA";
