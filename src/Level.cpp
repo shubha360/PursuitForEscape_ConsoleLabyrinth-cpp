@@ -27,11 +27,11 @@ Level::Level() {
 }
 
 Level::~Level() {
-	_deleteEnemies();
+	_deleteLevel();
 }
 
 // deletes all the enemies and empties the enemy vector
-void Level::_deleteEnemies() {
+void Level::_deleteLevel() {
 	for (int i = 0; i < _enemyGrid.size(); i++) {
 		for (int j = 0; j < _enemyGrid[i].size(); j++) {
 			if (_enemyGrid[i][j] != nullptr) {
@@ -44,19 +44,21 @@ void Level::_deleteEnemies() {
 	for (int i = 0; i < _enemies.size(); i++) {
 		_enemies[i] = nullptr;
 	}
+	_levelGrid.clear();
 	_enemies.clear();
+	_enemyGrid.clear();
 }
 
 void Level::addLevelFile(std::string levelFileLocation) {
 	_levelFileLocation = levelFileLocation;
 }
 
-bool Level::loadLevel(std::string currentFileLocation) {
+bool Level::loadLevel(std::string fileLocation) {
 
-	_inputStream.open(currentFileLocation);
+	_inputStream.open(fileLocation);
 
 	if (_inputStream.fail()) {
-		perror(currentFileLocation.c_str());
+		perror(fileLocation.c_str());
 		return false;
 	}
 
@@ -64,27 +66,31 @@ bool Level::loadLevel(std::string currentFileLocation) {
 
 	getline(_inputStream, line);
 
+	// if load file requested and no load game found
 	if (line == SAVE_FILE_DEFAULT_TEXT) {
 		_inputStream.close();
 		return false;
 	}
 
-	// emptying the enemy vector and grid before filling data again
-	_deleteEnemies();
+	// emptying the vectors and grids before filling data
+	_deleteLevel();
 
 	_levelName = line;
 	getline(_inputStream, line);
 
+	// rows and columns
 	_inputStream >> _rows;
 	getline(_inputStream, line);
 	_inputStream >> _columns;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
+	// total artifacts in level
     _inputStream >> _numberOfArtifacts;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
+	// health, money, artifacts
 	_inputStream >> _playerHealth;
 	getline(_inputStream, line);
 	_inputStream >> _playerMoney;
@@ -92,7 +98,8 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	_inputStream >> _artifactsCollected;
 	getline(_inputStream, line);
 	getline(_inputStream, line);
-
+	
+	// shield and healers
 	_inputStream >> _shields;
 	getline(_inputStream, line);
 	_inputStream >> _zombieInfHealers;
@@ -101,6 +108,7 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
+	// zombie infections, impaired movements, and artifacts hold by monster
 	_inputStream >> _zombieInfMovesLeft;
 	getline(_inputStream, line);
 	_inputStream >> _impairedMovesLeft;
@@ -109,18 +117,13 @@ bool Level::loadLevel(std::string currentFileLocation) {
 	getline(_inputStream, line);
 	getline(_inputStream, line);
 
+	// reading level line by line, then inspect character by character
 	for (int i = 0; i < _rows; i++) {
 		getline(_inputStream, line);
 
-		if (_levelGrid.size() < _rows) {
-			_levelGrid.push_back(line);
-		}
-		else {
-			_levelGrid[i] = line;
-		}
-
+		_levelGrid.push_back(line);
 		_enemyGrid.push_back(std::vector<Enemy*>());
-		_enemyGrid.back().resize(line.size(), nullptr);
+		_enemyGrid.back().resize(_columns, nullptr);
 
 		for (int j = 0; j < line.size(); j++) {
 			switch (line[j]) {
@@ -200,8 +203,8 @@ void Level::deleteSaveGame() {
 	_outputStream.close();
 }
 
-// damageArr holds damages dealt by multiple enemies on player when they to the same spot as player
-// enemyNameArr holds the name of the enemies
+// damageArr holds damages dealt by multiple enemies on player when they moved to the same spot as player
+// enemyArr holds the enemies
 // at most 3 enemies can attack the player
 void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]) {
 
@@ -209,6 +212,8 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerSh
 	int attackerCount = 0;
 
 	for (Enemy* enemy : _enemies) {
+
+		// move if enemy is alive
         if (enemy->isALive()) {
 			int damageHolder = 0;
 			int xHolder;
@@ -216,10 +221,12 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerSh
 
             enemy->move(playerX, playerY, playerHealth, damageHolder, xHolder, yHolder, _levelGrid, _enemyGrid);
 
-			if (damageHolder > 0) { // this enemy attacked the player
+			// this enemy attacked the player
+			if (damageHolder > 0) { 
 				damageArr[attackerCount] = damageHolder;
 				enemyArr[attackerCount] = _enemyGrid[yHolder][xHolder];
 
+				// didn't take damage if player had shield
                 if (playerShields > 0) {
                     playerShields--;
                 }
@@ -228,7 +235,8 @@ void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerSh
                 }
 				attackerCount++;
 			}
-			else if (damageHolder == -1) { // this enemy was attacked by the player
+			// this enemy was attacked by the player
+			else if (damageHolder == -1) { 
 				damageArr[attackerCount] = damageHolder;
 				enemyArr[attackerCount] = _enemyGrid[yHolder][xHolder];
 				attackerCount++;
@@ -255,7 +263,7 @@ void Level::printLevel() {
 	}
 }
 
-// get the character at xy coordinate
+// get the tile at xy coordinate
 char Level::getTileAtGrid(int x, int y) {
 	if (!_levelLoaded) {
 		std::cout << "Level not loaded!\n";

@@ -11,8 +11,8 @@ public:
 	Player();
 	Player(Level* level, Camera* camera);
 	bool movePlayer(char input);
-	std::string getPlayerInfo();
-	void updatePlayerAfterGameStateChange();
+	std::string getPlayerInfo(); // return player info in string, used for rendering
+	void updatePlayerAfterGameStateChange(); // updates player according to level file at new game, load game
 
 	int getPositionX() { return _posX; };
 	int getPositionY() { return _posY; };
@@ -22,7 +22,7 @@ public:
 
 private:
 	int _posX, _posY;
-	int _oldX, _oldY; // for storing coordinates of previous spot after a move
+	int _oldX, _oldY; // for storing coordinates of previous position after a move
 	Level* _currentLevel;
 	Camera* _camera;
 
@@ -36,14 +36,14 @@ private:
 
 	int _zombieInfectedMoves; // remaining zombie infected moves after got bitten by zombie
 	bool _zombieAttackedNow; // to determine if zombie attacked in the previous move
-	int _impairedMoves;
-	int _artifactsOfMonster;
+	int _impairedMoves; // remaining impaired moves after got attacked by witch
+	int _artifactsOfMonster; // artifacts hold by the monster
 
 	std::string _playerLog[11] {"", "", "", "", "", "", "", "", "", "", ""}; // to store the logs
 
-	void _combatEnemy(Enemy* enemy);
+	void _combatEnemy(Enemy* enemy); // combat with an enemy
 	bool _moveEnemies(); // moves enemies after player moves, returns false if player died from an enemy attack
-	std::string _processAttackFromEnemy(Enemy* enemy, int damage); // processes attack from enemy and returns log text
+	std::string _processAttackFromEnemy(Enemy* enemy, int damage); // processes an attack from enemy and returns log text, pass the enemy and damage done by the enemy
 	std::string _processEnemyKill(Enemy* enemy); // processes enemy kill and returns log text
 
 	void _addLog(std::string logText); // adds new log text to log array
@@ -57,6 +57,6 @@ private:
 	void _moveRight();
 
 	void _enterShop(); // starts the shop
-	bool _buyItem(std::string itemName, int itemPrize); // returns true if player has eneough money
+	bool _buyItem(std::string itemName, int itemPrize); // returns true if player has enough money to buy the item
 };
 

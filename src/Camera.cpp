@@ -35,7 +35,7 @@ Camera::Camera(Level* level) {
 	_currentLevel = level;
 }
 
-// center the camera according to player's xy coordinate
+// centers the camera according to player's xy coordinate
 void Camera::setCameraPosition(int x, int y) {
 	_posY = y - CAMERA_HEIGHT / 2;
 
@@ -56,11 +56,12 @@ void Camera::setCameraPosition(int x, int y) {
 	}
 }
 
-// render the view inside camera
+// renders the view inside camera
 void Camera::render(std::string playerInfo) {
 	_captureAndPrint(_posX, _posY, false, playerInfo);
 }
 
+// opens the map view mode
 void Camera::openMapView(std::string playerInfo) {
 	int viewMapPosX = 0;
 	int viewMapPosY = 0;
@@ -75,6 +76,7 @@ void Camera::openMapView(std::string playerInfo) {
 
 	do {		
 
+		// print if position changed
 		if (oldViewMapPosX != viewMapPosX || oldViewMapPosY != viewMapPosY) {
 			
 			_captureAndPrint(viewMapPosX, viewMapPosY, true, playerInfo);
@@ -85,25 +87,25 @@ void Camera::openMapView(std::string playerInfo) {
 		input = _getch();
 
 		switch (input) {
-		case 'w':
+		case 'w': // up
 			if (viewMapPosY > 0) {
 				viewMapPosY--;
 			}
 			break;
 
-		case 's':
+		case 's': // down
 			if (viewMapPosY + CAMERA_HEIGHT < _currentLevel->getRows()) {
 				viewMapPosY++;
 			}
 			break;
 
-		case 'a':
+		case 'a': // left
 			if (viewMapPosX > 0) {
 				viewMapPosX--;
 			}
 			break;
 
-		case 'd':
+		case 'd': // right
 			if (viewMapPosX + CAMERA_WIDTH < _currentLevel->getColumns()) {
 				viewMapPosX++;
 			}
@@ -113,13 +115,13 @@ void Camera::openMapView(std::string playerInfo) {
 	} while (input != 27);
 }
 
-void Camera::_captureAndPrint(int cameraPosX, int cameraPosY, bool viewMapMode, std::string playerInfo) {
+void Camera::_captureAndPrint(int cameraPosX, int cameraPosY, bool mapViewMode, std::string playerInfo) {
 	static const std::string _topAndBottomLine(CAMERA_WIDTH, '-');
 	static const std::string _screenIndentTop(25, '\n');
 	static const std::string _screenIndentBottom(10, '\n');
 	static const std::string _screenIndentLeft(5, ' ');
 
-	static std::string viewMapHeading =
+	static const std::string mapViewHeading =
 		"###        ###       ###       #########      ##             ## ########## ######### ##                     ##\n"
 		"## ##    ## ##      ## ##      ##     ##       ##           ##      ##     ##         ##                   ## \n"
 		"##  ##  ##  ##     ##   ##     ##     ##        ##         ##       ##     ##          ##       ###       ##  \n"
@@ -134,8 +136,9 @@ void Camera::_captureAndPrint(int cameraPosX, int cameraPosY, bool viewMapMode, 
 	int legendIterator = 0;
 	std::string levelString = _screenIndentTop;
 
-	if (viewMapMode) {
-		levelString += viewMapHeading;
+	// print map view heading if in map view mode
+	if (mapViewMode) {
+		levelString += mapViewHeading;
 	}
 
 	for (int y = cameraPosY - 1; y <= cameraPosY + CAMERA_HEIGHT; y++) {

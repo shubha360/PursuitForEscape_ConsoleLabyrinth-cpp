@@ -31,6 +31,7 @@ The level file should be formatted exactly according to above format. Proper gam
 X - Escape Gate Locked
 ~ - Escape Gate Unlocked
 ! - Artifact
+0 - Shop
 S - Snake
 Z - Zombie
 W - Witch

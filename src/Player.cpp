@@ -30,6 +30,7 @@ Player::Player(Level* level, Camera* camera) {
 	_currentLevel = level;
 	_camera = camera;
 
+	// updates everything from the level file
     updatePlayerAfterGameStateChange();
 }
 
@@ -38,7 +39,7 @@ bool Player::movePlayer(char input) {
 	// to determine if the game ended
 	bool continueGame = true;
 
-	// any of w, a ,s, d was pressed
+	// any of w, a ,s, d was pressed, used to trigger enemy movement
 	bool playerTriedToMove = false;
 
 	switch (input) {
@@ -65,6 +66,7 @@ bool Player::movePlayer(char input) {
 			}
 		}
 
+		// perform zombie-infected move
         if (_zombieInfectedMoves > 0) {
             continueGame = _performAZombieInfectedMove();
 		}
@@ -122,22 +124,14 @@ bool Player::movePlayer(char input) {
 		}
 		else {
 			updatePlayerAfterGameStateChange();
-
-			// prevent triggering player moving functionality
-			_oldX = _posX;
-			_oldY = _posY;
 			_addLog("Game loaded");
 		}
 		break;
 
 	case 'n': // new game
 		_currentLevel->loadLevel(_currentLevel->getLevelFileLocation());
+		
 		updatePlayerAfterGameStateChange();
-
-		// prevent triggering player moving functionality
-		_oldX = _posX;
-		_oldY = _posY;
-
 		_addLog("Started new game");
 		break;
 
@@ -153,7 +147,8 @@ bool Player::movePlayer(char input) {
 	}
 
 	// different old and new coordinates mean player moved to a new tile
-	// check new tile for enemy or collectible if player didn't die due to zombie infection
+	// check new tile for enemy or collectible 
+	// player may die due to zombie infection while moving
 	if ((_posX != _oldX || _posY != _oldY) && continueGame) {
 
 		if (_currentLevel->getTileAtGrid(_posX, _posY) == Level::SIGN_SNAKE ||
@@ -254,11 +249,13 @@ bool Player::movePlayer(char input) {
         }
 	}
 
+	// render frame
 	_camera->render(getPlayerInfo());
 
 	return continueGame;
 }
 
+// return player info in string, used for rendering
 std::string Player::getPlayerInfo() {
 	static int plInfoWidth = 35;
 
@@ -272,6 +269,7 @@ std::string Player::getPlayerInfo() {
 	std::string impairedMovesText = " Impaired Moves: " + std::to_string(_impairedMoves);
 	std::string artifactsOfMonsterText = " Artifacts Hold By Monster: " + std::to_string(_artifactsOfMonster);
 
+	// player info lifo lines on the left with 35 width, log on the right of every line
 	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
 		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
@@ -287,6 +285,7 @@ std::string Player::getPlayerInfo() {
 	return infoStr;
 }
 
+// updates player according to level file at new game, load game
 void Player::updatePlayerAfterGameStateChange() {
     _posX = _currentLevel->getPlayerX();
 	_posY = _currentLevel->getPlayerY();
@@ -311,52 +310,68 @@ void Player::updatePlayerAfterGameStateChange() {
 	_camera->setCameraPosition(_posX, _posY);
 }
 
+// combat with an enemy
 void Player::_combatEnemy(Enemy* enemy) {
-    if (enemy->isALive()) {
-        static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-        int attacker = getAttacker(Enemy::RandomEngine);
-		//int attacker = 2;
+    static std::uniform_int_distribution<int> getAttacker(1, 2);
+	
+	// randomly generate who will attack
+    int attacker = getAttacker(Enemy::RandomEngine);
+	//int attacker = 2;
 
-		std::string log;
+	std::string log;
 
-        switch (attacker) {
-        case 1: // player attack
+    switch (attacker) {
+    case 1: // player attack
 
-			log = "Attacked and killed a " + enemy->getName() + ".";
-			log += _processEnemyKill(enemy);
-			_addLog(log);
-            break;
+		log = "Attacked and killed a " + enemy->getName() + ".";
+		log += _processEnemyKill(enemy);
+		_addLog(log);
+        break;
 
-        case 2: // enemy attack
-			int damage = enemy->getDamage();
+    case 2: // enemy defended
 
-			std::string log = "The " + enemy->getName() + " defended and countered.";
-			log += _processAttackFromEnemy(enemy, damage);
+		// get random damage
+		int damage = enemy->getDamage();
 
-            // only set resting if an enemy defended and countered, otherwise enemy will attack immediately after countering
-            enemy->setResting();
+		std::string log = "The " + enemy->getName() + " defended and countered.";
+		log += _processAttackFromEnemy(enemy, damage);
 
-			_addLog(log);
-            break;
-        }
+        // set resting if an enemy defended and countered, otherwise enemy will attack immediately after countering
+        enemy->setResting();
+
+		// player did not move
+		_posX = _oldX;
+		_posY = _oldY;
+
+		_addLog(log);
+        break;
     }
 }
 
 // moves enemies after player moves, returns false if player died from an enemy attack
 bool Player::_moveEnemies() {
-	int enemyDamageArr[3]; // for getting damage dealt by a moving enemy
-	Enemy* enemyArr[3] { nullptr,nullptr,nullptr }; // for getting the name of the enemy
+	
+	// while moving, 3 enemies can attack at max
+	// for getting damages dealt by a moving enemy
+	int enemyDamageArr[3];
+
+	// for storing the enemies that got involed
+	Enemy* enemyArr[3] { nullptr,nullptr,nullptr };
 
 	_currentLevel->moveEnemies(_posX, _posY, _currentHealth, _shields, enemyDamageArr, enemyArr);
 
 	for (int i = 0; i < 3; i++) {
-		if (enemyDamageArr[i] > 0) { // enemy attacked the player
+
+		// enemy attacked the player
+		if (enemyDamageArr[i] > 0) { 
 
 			std::string log = "A " + enemyArr[i]->getName() + " attacked.";
 			std::string logFromEnemyAttack = _processAttackFromEnemy(enemyArr[i], enemyDamageArr[i]);
 			_addLog(log + logFromEnemyAttack);
 		}
+
+		// defended enemy attack and killed
 		else if (enemyDamageArr[i] == -1) {
 
 			std::string log = "Defended and killed a " + enemyArr[i]->getName() + ".";
@@ -375,6 +390,7 @@ bool Player::_moveEnemies() {
 std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
     std::string output = "";
 
+	// blocked attack using shield, if shield was available
     if (_shields > 0) {
         _shields--;
         output = " Blocked using a shield. Shields remaining: " + std::to_string(_shields) + ".";
@@ -385,12 +401,13 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
         std::string affects;
 
         switch (enemy->getType()) {
-        case EnemyType::SNAKE:
+        
+		case EnemyType::SNAKE:
             affects = ".";
             break;
 
         case EnemyType::ZOMBIE:
-            _zombieInfectedMoves = 5;
+            _zombieInfectedMoves = 5; 
             _zombieAttackedNow = true;
             affects = " and got 5 zombie-infected moves.";
             break;
@@ -408,10 +425,6 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
         }
         output = " Lost " + std::to_string(damage) + " health" + affects;
     }
-
-    // player did not move
-    _posX = _oldX;
-    _posY = _oldY;
 
 	return output;
 }
@@ -459,6 +472,7 @@ void Player::_addLog(std::string logText) {
 void Player::_increaseHealth(int amountToIncrease) {
 	_currentHealth += amountToIncrease;
 
+	// health should not be more than 100
 	if (_currentHealth > 100) {
 		_currentHealth = 100;
 	}
@@ -526,58 +540,52 @@ void Player::_performAnImpairedMove() {
 }
 
 void Player::_moveUp() {
+
+	// move up if the tile is not a wall, a gate wall, or a locked escape gate
 	if (_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_WALL &&
 		_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_WALL &&
-		_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_OPEN) {
+		_currentLevel->getTileAtGrid(_posX, _posY - 1) != Level::SIGN_GATE_LOCKED) {
 
 		_posY--;
-	}
-	else {
-		_addLog("Moving up is blocked by something.");
 	}
 }
 
 void Player::_moveDown() {
+	
+	// move down if the tile is not a wall, a gate wall, or a locked escape gate
 	if (_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_WALL &&
 		_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_WALL &&
 		_currentLevel->getTileAtGrid(_posX, _posY + 1) != Level::SIGN_GATE_LOCKED) {
 
 		_posY++;
 	}
-	else {
-		_addLog("Moving down is blocked by something.");
-	}
 }
 
 void Player::_moveLeft() {
+
+	// move left if the tile is not a wall, a gate wall, or a locked escape gate
 	if (_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_WALL &&
 		_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_WALL &&
 		_currentLevel->getTileAtGrid(_posX - 1, _posY) != Level::SIGN_GATE_LOCKED) {
 
 		_posX--;
 	}
-	else {
-		_addLog("Moving left is blocked by something.");
-	}
 }
 
 void Player::_moveRight() {
+
+	// move right if the tile is not a wall, a gate wall, or a locked escape gate
 	if (_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_WALL &&
 		_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_WALL &&
 		_currentLevel->getTileAtGrid(_posX + 1, _posY) != Level::SIGN_GATE_LOCKED) {
 
 		_posX++;
 	}
-	else {
-		_addLog("Moving right is blocked by something.");
-	}
 }
 
 void Player::_enterShop() {
 
 	bool inTheShop = true; // shop loop
-
-	static const int totalItems = 8;
 
 	static const std::string topIndent(30, '\n');
 
@@ -669,7 +677,7 @@ void Player::_enterShop() {
 			}
 			break;
 
-		case -21:
+		case -21: // Esc pressed, 27 - 48 = -21
 			inTheShop = false;
 			break;
 

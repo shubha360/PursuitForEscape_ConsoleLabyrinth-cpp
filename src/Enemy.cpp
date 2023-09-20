@@ -3,13 +3,14 @@
 std::random_device Enemy::_seed;
 std::mt19937 Enemy::RandomEngine(_seed());
 
+// randomly generate damage in range
 int Enemy::getDamage() {
 	return _generateDamage(RandomEngine);
 }
 
 // damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
-// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
 // if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
+// enemyXHolder and enemyYHolder hold the coordinates of the enemy, pass integer references
 void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, int& enemyXHolder, int& enemyYHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 
 	// attack if player is in a spot adjacent to this enemy
@@ -26,17 +27,23 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 
 				static std::uniform_int_distribution<int> getAttacker(1, 2);
 
-				int attacker = getAttacker(RandomEngine);
+				// randomly generate who will attack
+				int const attacker = getAttacker(RandomEngine);
 				//int attacker = 1;
 
 				switch (attacker) {
 				case 1: // enemy attack
+
+					// get random damage
 					damageHolder = _generateDamage(RandomEngine);
 
 					if (playerHealth - damageHolder <= 0) { // if player died, set this enemy's position to player's position
+						
+						// update level grid, set enemy position to player position
 						levelGrid[playerY][playerX] = _sign;
 						levelGrid[_posY][_posX] = ' ';
 
+						// update enemy grid, set previous position to null
 						enemyGrid[playerY][playerX] = enemyGrid[_posY][_posX];
 						enemyGrid[_posY][_posX] = nullptr;
 
@@ -49,18 +56,17 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 					break;
 
 				case 2: // player attack
-					damageHolder = -1;
+					damageHolder = -1; // -1 for player attack
 					enemyXHolder = _posX;
 					enemyYHolder = _posY;
 
 					levelGrid[_posY][_posX] = ' ';
-					this->die();
 					break;
 				}
 			}
 		}
 	}
-	else {
+	else { // moves towards player or move randomly
 		if (!_moveTowardsPlayers(playerX, playerY, levelGrid, enemyGrid)) {
 			_moveRandomly(levelGrid, enemyGrid);
 		}
@@ -68,47 +74,56 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 }
 
 bool Enemy::_moveTowardsPlayers(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-	int absDisX = abs(_posX - playerX);
-	int absDisY = abs(_posY - playerY);
-	int distance = absDisX + absDisY;
+	
+	int absDisX = abs(_posX - playerX); // absolute horizontal distance
+	int absDisY = abs(_posY - playerY); // absolute vertical distance
+	int distance = absDisX + absDisY; // total distance
 
-	if (distance <= 5) {
+	// moves towards player if distance not more than 5
+	if (distance <= 5) { 
+		
+		// moves vertically, if vertical distance is less than horizontal distance
 		if (absDisY < absDisX) {
-            if (absDisY == 0) {
+            
+			// if vertical distance is zero, move horizontally
+			if (absDisY == 0) { 
                 _moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
             }
             else {
-                if (playerY < _posY) {
-                    if (!_moveUp(levelGrid, enemyGrid)) {
-                        _moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
-                    }
-                }
-                else if (playerY > _posY) {
-                    if (!_moveDown(levelGrid, enemyGrid)) {
-                        _moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
-                    }
-                }
+
+				// tries to move vertically
+				if (!_moveVertically(playerX, playerY, levelGrid, enemyGrid)) {
+
+					// moves horizontally if vertical movement is blocked
+					_moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
+				}
             }
 		}
-		else if (absDisX < absDisY) {
-            if (absDisX == 0) {
+		// moves horizontally, if horizontal distance is less than vertical distance
+		else if (absDisX < absDisY) { 
+			
+			// if horizontal distance is zero, move vertically// if horizontal distance is zero, move vertically
+			if (absDisX == 0) { 
                 _moveVertically(playerX, playerY, levelGrid, enemyGrid);
             }
             else {
-                if (playerX < _posX) {
-                    if (!_moveLeft(levelGrid, enemyGrid)) {
-                        _moveVertically(playerX, playerY, levelGrid, enemyGrid);
-                    }
-                }
-                else if (playerX > _posX) {
-                    if (!_moveRight(levelGrid, enemyGrid)) {
-                        _moveVertically(playerX, playerY, levelGrid, enemyGrid);
-                    }
-                }
+
+				// tries to move horizontally
+				if (!_moveHorizontally(playerX, playerY, levelGrid, enemyGrid)) {
+
+					// moves vertically if horizontal movement is blocked
+					_moveVertically(playerX, playerY, levelGrid, enemyGrid);
+				}
             }
 		}
-		else {
+
+		// if both horizontal and vertical distances are same
+		else { 
+
+			// tries to move vertically
 			if (!_moveVertically(playerX, playerY, levelGrid, enemyGrid)) {
+
+				// moves horizontally if vertical movement is blocked
 				_moveHorizontally(playerX, playerY, levelGrid, enemyGrid);
 			}
 		}
@@ -145,29 +160,42 @@ void Enemy::_moveRandomly(std::vector<std::string>& levelGrid, std::vector<std::
     }
 }
 
+bool Enemy::_moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+
+	// player is above
+	if (playerY < _posY) {
+		return _moveUp(levelGrid, enemyGrid);
+	}
+
+	// player is below
+	else if (playerY > _posY) {
+		return _moveDown(levelGrid, enemyGrid);
+	}
+}
+
 bool Enemy::_moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-    if (playerX < _posX) {
+    
+	// player is on the left
+	if (playerX < _posX) {
         return _moveLeft(levelGrid, enemyGrid);
     }
+	
+	// player is on the right
     else if (playerX > _posX) {
         return _moveRight(levelGrid, enemyGrid);
     }
 }
 
-bool Enemy::_moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
-    if (playerY < _posY) {
-		return _moveUp(levelGrid, enemyGrid);
-    }
-    else if (playerY > _posY) {
-		return _moveDown(levelGrid, enemyGrid);
-    }
-}
-
 bool Enemy::_moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+
+	// if desired spot is vacant
 	if (levelGrid[_posY - 1][_posX] == ' ') {
+
+		// update level grid
 		levelGrid[_posY][_posX] = ' ';
 		levelGrid[_posY - 1][_posX] = _sign;
 
+		// update enemy grid
 		enemyGrid[_posY - 1][_posX] = enemyGrid[_posY][_posX];
 		enemyGrid[_posY][_posX] = nullptr;
 
@@ -178,10 +206,15 @@ bool Enemy::_moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector
 }
 
 bool Enemy::_moveDown(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+
+	// if desired spot is vacant
 	if (levelGrid[_posY + 1][_posX] == ' ') {
+		
+		// update level grid
 		levelGrid[_posY][_posX] = ' ';
 		levelGrid[_posY + 1][_posX] = _sign;
 
+		// update enemy grid
 		enemyGrid[_posY + 1][_posX] = enemyGrid[_posY][_posX];
 		enemyGrid[_posY][_posX] = nullptr;
 
@@ -192,10 +225,15 @@ bool Enemy::_moveDown(std::vector<std::string>& levelGrid, std::vector<std::vect
 }
 
 bool Enemy::_moveLeft(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+
+	// if desired spot is vacant
 	if (levelGrid[_posY][_posX - 1] == ' ') {
+
+		// update level grid
 		levelGrid[_posY][_posX] = ' ';
 		levelGrid[_posY][_posX - 1] = _sign;
 
+		// update enemy grid
 		enemyGrid[_posY][_posX - 1] = enemyGrid[_posY][_posX];
 		enemyGrid[_posY][_posX] = nullptr;
 
@@ -206,10 +244,15 @@ bool Enemy::_moveLeft(std::vector<std::string>& levelGrid, std::vector<std::vect
 }
 
 bool Enemy::_moveRight(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+
+	// if desired spot is vacant
 	if (levelGrid[_posY][_posX + 1] == ' ') {
+
+		// update level grid
 		levelGrid[_posY][_posX] = ' ';
 		levelGrid[_posY][_posX + 1] = _sign;
 
+		// update enemy grid
 		enemyGrid[_posY][_posX + 1] = enemyGrid[_posY][_posX];
 		enemyGrid[_posY][_posX] = nullptr;
 

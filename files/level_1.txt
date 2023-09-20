@@ -10,8 +10,8 @@ Level 1
 0 - Number of artifacts collected
 
 0 - Shields
-1 - Zombie infection healer
-1 - Impaired movement healer
+0 - Zombie infection healer
+0 - Impaired movement healer
 
 0 - Zombie-infected moves remaining
 0 - Impaired moves remaining
@@ -20,7 +20,7 @@ Level 1
 ############################################################
 #                       #                                  #
 #                       #                                ! #
-#   @                   #                                  #
+#    @                  #                                  #
 #                       #                                  #
 #                 !     #              #####################
 #                       #              #                   #

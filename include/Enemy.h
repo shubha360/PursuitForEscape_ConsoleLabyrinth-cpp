@@ -11,14 +11,13 @@ public:
 	static std::mt19937 RandomEngine;
 
 	// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
-	// enemyNameHolder holds the name of the enemy, pass any string reference to get the enemy name
 	// if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
-	void move(int playerX, int playerY, int playerHealth, int& damageHolder, int& enemyXHolder, int& enemyYHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	// enemyXHolder and enemyYHolder hold the coordinates of the enemy, pass integer references
+	void move(int playerX, int playerY, int playerHealth, 
+		int& damageHolder, int& enemyXHolder, int& enemyYHolder, 
+		std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
-	// set an enemy to specific position
-	void set(int newX, int newY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
-
-	int getDamage();
+	int getDamage(); // randomly generate damage in range
 	int getMoney() { return _moneyToGain; }
 	std::string getName() { return _name; }
 	EnemyType getType() { return _type; }
@@ -49,8 +48,11 @@ private:
     bool _moveTowardsPlayers(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
     void _moveRandomly(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
-    bool _moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid); // move horizontally towards player
-    bool _moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid); // move vertically towards player
+	// move vertically towards player
+	bool _moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+
+	// move horizontally towards player
+    bool _moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid); 
 
 	bool _moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 	bool _moveDown(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
