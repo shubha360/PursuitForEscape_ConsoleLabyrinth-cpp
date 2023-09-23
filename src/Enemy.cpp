@@ -281,7 +281,7 @@ Zombie::Zombie(int posX, int posY) {
 	_posY = posY;
 	_minDamage = 10;
 	_maxDamage = 15;
-	_moneyToGain = 50;
+	_moneyToGain = 30;
 	_name = "zombie";
 	_type = EnemyType::ZOMBIE;
 	_sign = 'Z';
@@ -295,7 +295,7 @@ Witch::Witch(int posX, int posY) {
 	_posY = posY;
 	_minDamage = 40;
 	_maxDamage = 50;
-	_moneyToGain = 120;
+	_moneyToGain = 60;
 	_name = "witch";
 	_type = EnemyType::WITCH;
 	_sign = 'W';
@@ -309,7 +309,7 @@ Monster::Monster(int posX, int posY) {
 	_posY = posY;
 	_minDamage = 75;
 	_maxDamage = 95;
-	_moneyToGain = 200;
+	_moneyToGain = 100;
 	_name = "monster";
 	_type = EnemyType::MONSTER;
 	_sign = 'M';

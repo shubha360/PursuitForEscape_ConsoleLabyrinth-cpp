@@ -21,7 +21,6 @@ Player::Player() {
     _impairedMovementHealers = -1;
 
 	_zombieInfectedMoves = 0;
-	_zombieAttackedNow = false;
 	_impairedMoves = 0;
 	_artifactsOfMonster = 0;
 }
@@ -213,6 +212,9 @@ bool Player::movePlayer(char input) {
 				_addLog("Opened map view.");
 				_camera->openMapView(getPlayerInfo());
 				_addLog("Exited map view.");
+				
+				// should not trigger enemy movement when levaing map
+				playerTriedToMove = false;
 			}
 
 			// enter shop
@@ -224,6 +226,9 @@ bool Player::movePlayer(char input) {
 				// shop should not be removed from level, setting player to the previous position
 				_posX = _oldX;
 				_posY = _oldY;
+
+				// should not trigger enemy movement when levaing shop
+				playerTriedToMove = false;
 			}
 
 			// game is ended if player accessed the escape gate
@@ -269,7 +274,7 @@ std::string Player::getPlayerInfo() {
 	std::string impairedMovesText = " Impaired Moves: " + std::to_string(_impairedMoves);
 	std::string artifactsOfMonsterText = " Artifacts Hold By Monster: " + std::to_string(_artifactsOfMonster);
 
-	// player info lifo lines on the left with 35 width, log on the right of every line
+	// player info lines on the left with 35 width, log on the right of every line
 	std::string infoStr = healthStr + std::string(plInfoWidth - healthStr.size(), ' ') + "|> " + _playerLog[0] + "\n"
 		+ moneyStr + std::string(plInfoWidth - moneyStr.size(), ' ') + "|> " + _playerLog[1] + "\n"
 		+ artifactsStr + std::string(plInfoWidth - artifactsStr.size(), ' ') + "|> " + _playerLog[2] + "\n"
@@ -301,7 +306,6 @@ void Player::updatePlayerAfterGameStateChange() {
 	_impairedMovementHealers = _currentLevel->getImpairedMoveHealers();
 
 	_zombieInfectedMoves = _currentLevel->getZombieInfectedMoves();
-	_zombieAttackedNow = false;
 
 	_impairedMoves = _currentLevel->getImpairedMoves();
 	_artifactsOfMonster = _currentLevel->getArtifactsHoldByMonster();
@@ -356,7 +360,7 @@ bool Player::_moveEnemies() {
 	// for getting damages dealt by a moving enemy
 	int enemyDamageArr[3];
 
-	// for storing the enemies that got involed
+	// for storing the enemies that got involved
 	Enemy* enemyArr[3] { nullptr,nullptr,nullptr };
 
 	_currentLevel->moveEnemies(_posX, _posY, _currentHealth, _shields, enemyDamageArr, enemyArr);
@@ -408,7 +412,6 @@ std::string Player::_processAttackFromEnemy(Enemy* enemy, int damage) {
 
         case EnemyType::ZOMBIE:
             _zombieInfectedMoves = 5; 
-            _zombieAttackedNow = true;
             affects = " and got 5 zombie-infected moves.";
             break;
 
@@ -481,26 +484,20 @@ void Player::_increaseHealth(int amountToIncrease) {
 // returns false if player died during the move
 bool Player::_performAZombieInfectedMove() {
     bool playerAlive = true;
-    
-	// do not perform a zombie infected move if a zombie attacked in the previous move
-    if (_zombieAttackedNow) {
-        _zombieAttackedNow = false;
-    }
-    else {
-        static std::uniform_int_distribution<int> getZombieBiteDamage(2, 4);
+  
+    static std::uniform_int_distribution<int> getZombieBiteDamage(2, 4);
 
-        int damage = getZombieBiteDamage(Enemy::RandomEngine);
-        _currentHealth -= damage;
-        _zombieInfectedMoves--;
+    int damage = getZombieBiteDamage(Enemy::RandomEngine);
+    _currentHealth -= damage;
+    _zombieInfectedMoves--;
 
-        _addLog("Lost " + std::to_string(damage) + " health due to zombie infection. "
-            + std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
+    _addLog("Lost " + std::to_string(damage) + " health due to zombie infection. "
+        + std::to_string(_zombieInfectedMoves) + " more zombie-infected move remains.");
 
-        if (_currentHealth <= 0) { // player died
-            _currentLevel->erasePlayer(_oldX, _oldY);
-            _addLog("Player died!");
-            playerAlive = false;
-        }
+    if (_currentHealth <= 0) { // player died
+        _currentLevel->erasePlayer(_oldX, _oldY);
+        _addLog("Player died!");
+        playerAlive = false;
     }
     return playerAlive;
 }

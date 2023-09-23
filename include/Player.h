@@ -35,7 +35,6 @@ private:
 	int _impairedMovementHealers;
 
 	int _zombieInfectedMoves; // remaining zombie infected moves after got bitten by zombie
-	bool _zombieAttackedNow; // to determine if zombie attacked in the previous move
 	int _impairedMoves; // remaining impaired moves after got attacked by witch
 	int _artifactsOfMonster; // artifacts hold by the monster
 

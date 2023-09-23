@@ -156,14 +156,14 @@ void GameManager::_printHowToPlay() {
 
 		"Zombie - Can deal 10 - 15 health damage to the player at once and then 2 - 4 health damage for each of next 5 moves. "
 		"Total 35 damage at the worst case. "
-		"Player earns 50 currency for killing a zombie.\n\n"
+		"Player earns 30 currency for killing a zombie.\n\n"
 
 		"Witch - Can deal 40 - 50 health damage to the player and next 3 moves of the player will be impaired. "
 		"Impaired means the player can't move in the direction it intended to. The player will move in another direction. "
-		"Player earns 120 currency for killing a witch.\n\n"
+		"Player earns 60 currency for killing a witch.\n\n"
 
 		"Monster - The strongest one. Can deal 75 - 95 health damage to the player and also take the artifacts player have. "
-		"Player earns 200 currency and the artifacts back for killing a monster. At most 1 monster will be in a level. "
+		"Player earns 100 currency and the artifacts back for killing a monster. At most 1 monster will be in a level. "
 		"Monster may also hold artifacts from the start of the game. " 
 		"If all available artifacts are collected but still there are some artifacts left to collect, there should be a monster who is holding the artifacts. \n\n"
 
