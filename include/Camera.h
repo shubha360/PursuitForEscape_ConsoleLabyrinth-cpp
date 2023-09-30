@@ -11,10 +11,10 @@ public:
 
 	Camera();
 	Camera(Level* level);
-	void setCameraPosition(int x, int y); // center the camera according to player's xy coordinate
-	void render(std::string playerInfo); // render the view inside camera
+	void setCameraPosition(const int& x, const int& y); // center the camera according to player's xy coordinate
+	void render(const std::string& playerInfo); // render the view inside camera
 
-	void openMapView(std::string playerInfo); // opens map view
+	void openMapView(const std::string& playerInfo); // opens map view
 
 private:
 	int _posX, _posY;
@@ -25,6 +25,6 @@ private:
 	// takes the part of the level to print inside camera
 	// mapViewMode is true if in map view
 	// playerInfo is printed right under the level view
-	void _captureAndPrint(int cameraPosX, int cameraPosY, bool mapViewMode, std::string playerInfo);
+	void _captureAndPrint(const int& cameraPosX, const int& cameraPosY, const bool& mapViewMode, const std::string& playerInfo);
 };
 

@@ -11,7 +11,7 @@ int Enemy::getDamage() {
 // damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
 // if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
 // enemyXHolder and enemyYHolder hold the coordinates of the enemy, pass integer references
-void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, int& enemyXHolder, int& enemyYHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+void Enemy::move(const int& playerX, const int& playerY, const int& playerHealth, int& damageHolder, int& enemyXHolder, int& enemyYHolder, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 
 	// attack if player is in a spot adjacent to this enemy
 	if ((playerX == _posX - 1 && playerY == _posY) ||
@@ -73,7 +73,7 @@ void Enemy::move(int playerX, int playerY, int playerHealth, int& damageHolder, 
 	}
 }
 
-bool Enemy::_moveTowardsPlayers(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+bool Enemy::_moveTowardsPlayers(const int& playerX, const int& playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 	
 	int absDisX = abs(_posX - playerX); // absolute horizontal distance
 	int absDisY = abs(_posY - playerY); // absolute vertical distance
@@ -160,7 +160,7 @@ void Enemy::_moveRandomly(std::vector<std::string>& levelGrid, std::vector<std::
     }
 }
 
-bool Enemy::_moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+bool Enemy::_moveVertically(const int& playerX, const int& playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
 
 	// player is above
 	if (playerY < _posY) {
@@ -173,7 +173,7 @@ bool Enemy::_moveVertically(int playerX, int playerY, std::vector<std::string>& 
 	}
 }
 
-bool Enemy::_moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
+bool Enemy::_moveHorizontally(const int& playerX, const int& playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid) {
     
 	// player is on the left
 	if (playerX < _posX) {

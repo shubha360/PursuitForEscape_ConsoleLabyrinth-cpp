@@ -13,7 +13,7 @@ public:
 	// damageHolder holds damage dealt by an enemy while moving, always pass a integer reference with value 0 to get the damage
 	// if enemy attacked damageHolder will be the damage value, if player attacked damageHolder will be -1
 	// enemyXHolder and enemyYHolder hold the coordinates of the enemy, pass integer references
-	void move(int playerX, int playerY, int playerHealth, 
+	void move(const int& playerX, const int& playerY, const int& playerHealth,
 		int& damageHolder, int& enemyXHolder, int& enemyYHolder, 
 		std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
@@ -45,14 +45,14 @@ protected:
 private:
 	static std::random_device _seed;
 
-    bool _moveTowardsPlayers(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+    bool _moveTowardsPlayers(const int& playerX, const int& playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
     void _moveRandomly(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
 	// move vertically towards player
-	bool _moveVertically(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
+	bool _moveVertically(const int& playerX, const int& playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
 	// move horizontally towards player
-    bool _moveHorizontally(int playerX, int playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid); 
+    bool _moveHorizontally(const int& playerX, const int& playerY, std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 
 	bool _moveUp(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);
 	bool _moveDown(std::vector<std::string>& levelGrid, std::vector<std::vector<Enemy*>>& enemyGrid);

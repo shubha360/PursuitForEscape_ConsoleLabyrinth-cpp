@@ -36,7 +36,7 @@ Camera::Camera(Level* level) {
 }
 
 // centers the camera according to player's xy coordinate
-void Camera::setCameraPosition(int x, int y) {
+void Camera::setCameraPosition(const int& x, const int& y) {
 	_posY = y - CAMERA_HEIGHT / 2;
 
 	if (_posY < 0) {
@@ -57,12 +57,12 @@ void Camera::setCameraPosition(int x, int y) {
 }
 
 // renders the view inside camera
-void Camera::render(std::string playerInfo) {
+void Camera::render(const std::string& playerInfo) {
 	_captureAndPrint(_posX, _posY, false, playerInfo);
 }
 
 // opens the map view mode
-void Camera::openMapView(std::string playerInfo) {
+void Camera::openMapView(const std::string& playerInfo) {
 	int viewMapPosX = 0;
 	int viewMapPosY = 0;
 
@@ -115,7 +115,7 @@ void Camera::openMapView(std::string playerInfo) {
 	} while (input != 27);
 }
 
-void Camera::_captureAndPrint(int cameraPosX, int cameraPosY, bool mapViewMode, std::string playerInfo) {
+void Camera::_captureAndPrint(const int& cameraPosX, const int& cameraPosY, const bool& mapViewMode, const std::string& playerInfo) {
 	static const std::string _topAndBottomLine(CAMERA_WIDTH, '-');
 	static const std::string _screenIndentTop(25, '\n');
 	static const std::string _screenIndentBottom(10, '\n');

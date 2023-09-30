@@ -33,7 +33,7 @@ Player::Player(Level* level, Camera* camera) {
     updatePlayerAfterGameStateChange();
 }
 
-bool Player::movePlayer(char input) {
+bool Player::movePlayer(const char& input) {
 
 	// to determine if the game ended
 	bool continueGame = true;
@@ -687,7 +687,7 @@ void Player::_enterShop() {
 }
 
 // returns true if player has enough money to but this item
-bool Player::_buyItem(std::string itemName, int itemPrize) {
+bool Player::_buyItem(const std::string& itemName, const int& itemPrize) {
 	std::string output = "";
 	bool bought = true;
 	

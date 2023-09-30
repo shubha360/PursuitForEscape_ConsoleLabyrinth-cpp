@@ -30,22 +30,22 @@ public:
 
 	Level();
 	~Level();
-	void addLevelFile(std::string levelFileLocation);
-	bool loadLevel(std::string fileLocation);
-	void saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts,
-                int shields, int zombieInfectionHealers, int impairedMoveHealers,
-                int zombieInfectedMoves, int impairedMoves, int artifactsOfMonster);
+	void addLevelFile(const std::string& levelFileLocation);
+	bool loadLevel(const std::string& fileLocation);
+	void saveLevel(const int& playerPosX, const int& playerPosY, const int& playerHealth, const int& playerMoney, const int& playerArtifacts,
+		const int& shields, const int& zombieInfectionHealers, const int& impairedMoveHealers,
+		const int& zombieInfectedMoves, const int& impairedMoves, const int& artifactsOfMonster);
 	void deleteSaveGame();
-	char getTileAtGrid(int x, int y); // get the tile at xy coordinate
-	void setPlayer(int newX, int newY); // set player at xy coordinate
-	void setPlayer(int newX, int newY, int _oldX, int _oldY); // set player at new xy coordinate and reset old xy coordinate
-	void erasePlayer(int playerX, int playerY); // erase player from grid, if died
+	char getTileAtGrid(const int& x, const int& y); // get the tile at xy coordinate
+	void setPlayer(const int& newX, const int& newY); // set player at xy coordinate
+	void setPlayer(const int& newX, const int& newY, const int& _oldX, const int& _oldY); // set player at new xy coordinate and reset old xy coordinate
+	void erasePlayer(const int& playerX, const int& playerY); // erase player from grid, if died
 	void openEscapeGate(); // open the escape gate when all artifacts are collected
 
 	// damageArr holds damages dealt by multiple enemies on player when they moved to the same spot as player
 	// enemyArr holds the enemies
 	// at most 3 enemies can attack the player
-	void moveEnemies(int playerX, int playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]);
+	void moveEnemies(const int& playerX, const int& playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]);
 
 	void printLevel(); // print whole level at once
 

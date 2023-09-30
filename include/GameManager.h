@@ -8,7 +8,7 @@ enum class GameStates { MAIN_MENU, PLAY_GAME, HOW_TO_PLAY, EXIT };
 
 class GameManager {
 public:
-	GameManager(std::string levelFileLocation);
+	GameManager(const std::string& levelFileLocation);
 	void playGame();
 
 private:

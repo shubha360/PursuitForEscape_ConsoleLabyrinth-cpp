@@ -1,6 +1,6 @@
 #include "../include/GameManager.h"
 
-GameManager::GameManager(std::string levelFileLocation) {
+GameManager::GameManager(const std::string& levelFileLocation) {
 	_state = GameStates::MAIN_MENU;
 	_level.addLevelFile(levelFileLocation);
 	_levelLoaded = false;

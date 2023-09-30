@@ -49,11 +49,11 @@ void Level::_deleteLevel() {
 	_enemyGrid.clear();
 }
 
-void Level::addLevelFile(std::string levelFileLocation) {
+void Level::addLevelFile(const std::string& levelFileLocation) {
 	_levelFileLocation = levelFileLocation;
 }
 
-bool Level::loadLevel(std::string fileLocation) {
+bool Level::loadLevel(const std::string& fileLocation) {
 
 	_inputStream.open(fileLocation);
 
@@ -165,9 +165,9 @@ bool Level::loadLevel(std::string fileLocation) {
 	return true;
 }
 
-void Level::saveLevel(int playerPosX, int playerPosY, int playerHealth, int playerMoney, int playerArtifacts,
-                      int shields, int zombieInfectionHealers, int impairedMoveHealers,
-                      int zombieInfectedMoves, int impairedMoves, int artifactsOfMonster) {
+void Level::saveLevel(const int& playerPosX, const int& playerPosY, const int& playerHealth, const int& playerMoney, const int& playerArtifacts,
+	const int& shields, const int& zombieInfectionHealers, const int& impairedMoveHealers,
+	const int& zombieInfectedMoves, const int& impairedMoves, const int& artifactsOfMonster) {
 
 	_outputStream.open(SAVE_FILE_LOCATION);
 
@@ -206,7 +206,7 @@ void Level::deleteSaveGame() {
 // damageArr holds damages dealt by multiple enemies on player when they moved to the same spot as player
 // enemyArr holds the enemies
 // at most 3 enemies can attack the player
-void Level::moveEnemies(int playerX, int playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]) {
+void Level::moveEnemies(const int& playerX, const int& playerY, int playerHealth, int playerShields, int damageArr[], Enemy* enemyArr[]) {
 
 	// keeping count of the attacking enemies
 	int attackerCount = 0;
@@ -264,7 +264,7 @@ void Level::printLevel() {
 }
 
 // get the tile at xy coordinate
-char Level::getTileAtGrid(int x, int y) {
+char Level::getTileAtGrid(const int& x, const int& y) {
 	if (!_levelLoaded) {
 		std::cout << "Level not loaded!\n";
 		return SIGN_WALL;
@@ -273,7 +273,7 @@ char Level::getTileAtGrid(int x, int y) {
 }
 
 // set player at xy coordinate
-void Level::setPlayer(int newX, int newY) {
+void Level::setPlayer(const int& newX, const int& newY) {
 	if (!_levelLoaded) {
 		std::cout << "Level not loaded!\n";
 	}
@@ -283,7 +283,7 @@ void Level::setPlayer(int newX, int newY) {
 }
 
 // set player at new xy coordinate and reset old xy coordinate
-void Level::setPlayer(int newX, int newY, int _oldX, int _oldY) {
+void Level::setPlayer(const int& newX, const int& newY, const int& _oldX, const int& _oldY) {
 	if (!_levelLoaded) {
 		std::cout << "Level not loaded!\n";
 	}
@@ -293,7 +293,7 @@ void Level::setPlayer(int newX, int newY, int _oldX, int _oldY) {
 	}
 }
 
-void Level::erasePlayer(int playerX, int playerY) {
+void Level::erasePlayer(const int& playerX, const int& playerY) {
 	_levelGrid[playerY][playerX] = SIGN_EMPTY;
 }
 

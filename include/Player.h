@@ -10,7 +10,7 @@ public:
 
 	Player();
 	Player(Level* level, Camera* camera);
-	bool movePlayer(char input);
+	bool movePlayer(const char& input);
 	std::string getPlayerInfo(); // return player info in string, used for rendering
 	void updatePlayerAfterGameStateChange(); // updates player according to level file at new game, load game
 
@@ -56,6 +56,6 @@ private:
 	void _moveRight();
 
 	void _enterShop(); // starts the shop
-	bool _buyItem(std::string itemName, int itemPrize); // returns true if player has enough money to buy the item
+	bool _buyItem(const std::string& itemName, const int& itemPrize); // returns true if player has enough money to buy the item
 };
 
